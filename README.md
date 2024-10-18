@@ -83,7 +83,6 @@ This section should be all of the source code files that have a .java extension.
 - *Separation of concerns* is important so each responsibily is encapsulated by different components like player, Team, Board, Game etc. Even IO operations are handled in its own class.
 - Generics are used but kept at minimum. Cell is a generic since the information in the cell depends on the game.
 - Inheritance is used by all implemented games, since tictactoe, order and chaos are also games.
-- 
 
 ## How to compile and run
 ---------------------------------------------------------------------------
@@ -94,8 +93,12 @@ javac App.java && java App
 
 ## Caveats
 ---------------------------------------------------------------------------
-- Fixed. Multiple validations of input are not implemented yet
+- [Fixed] Multiple validations of input are not implemented yet
 - Only turn based games with a 2D Board can be implemented with the infrastructure provided
+
+## UML
+---------------------------------------------------------------------------
+![plot](./uml.jpeg)
 
 
 ## Input/Output Example
