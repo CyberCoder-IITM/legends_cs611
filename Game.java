@@ -7,14 +7,14 @@ import java.util.List;
 public abstract class Game<T> {
     protected Board<T> board;
     protected IOHelper iohelper;
-
+    // constructor
     protected Game(Board<T> board, IOHelper ioHelper) {
         this.board = board;
         this.iohelper = ioHelper;
     }
-
+    // abstract class play, implemented by different games with their own rules and logic
     public abstract void play();
-
+    // print the board in the terminal
     protected void printBoard() {
         List<List<Cell<T>>> b = this.board.getBoard();
         int n = b.size();
@@ -36,22 +36,23 @@ public abstract class Game<T> {
 
         this.iohelper.print(out.toString());
     }
-
+    // printing the lines to separate each cell and outline the board
     protected String line(int n) {
         return String.join("", Collections.nCopies(n, "+--")) + "+";
     }
-
+    // print the x or o game pieces to string used for printboard
     protected String xoToString(Cell<T> c, int n, int i, int j) {
         if (c.has(XOCell.EMPTY)) {
             return (n * i + j + 1) + "";
         }
         return c.toString();
     }
-
+    // check if the placed game piece on specific cell is valid or not, if valid place the move
+    // limited to x and o game pieces
     protected SetPositionMove readMove(Player player, XOCell sign) {
         int m = board.getNumCols();
 
-        int pos = this.iohelper.nextLineInt(String.format("Player:%s Enter your move:", player.toString()),
+        int pos = this.iohelper.nextLineInt(String.format("Player:%s Mark:%s Enter your move:", player.toString(),sign.toString()),
                 "input should be an integer in the board");
         pos--;
 
@@ -68,7 +69,7 @@ public abstract class Game<T> {
 
         return new SetPositionMove(p, sign);
     }
-
+    // same function as above, but the player could choose the game piece they place on the cell
     protected SetPositionMove readMoveWithSign(Player player) {
         int n = board.getNumRows();
 

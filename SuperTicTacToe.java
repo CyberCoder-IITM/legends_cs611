@@ -12,19 +12,19 @@ public class SuperTicTacToe extends Game<XOCell> {
     private Checker checker;
     private Random rand;
     private static final int GROUP_SIZE = 3;
-
+    // constructor
     protected SuperTicTacToe(Board<XOCell> board, int winCount, IOHelper ioHelper) {
         super(board, ioHelper);
         this.checker = new Checker();
         this.rand = new Random();
         this.winCount = winCount;
     }
-
+    // initialization
     public static SuperTicTacToe init(int n, int m, int c) {
         return new SuperTicTacToe(new Board<>(GROUP_SIZE * n, 3 * m, () -> XOCell.EMPTY), c,
                 new IOHelper(new Scanner(System.in)));
     }
-
+    // play method implementation, play logic and rule for super tic tac toe
     @Override
     public void play() {
         int turn = 0;
@@ -52,7 +52,7 @@ public class SuperTicTacToe extends Game<XOCell> {
             turn++;
         }
     }
-
+    // place move at position give by player
     private SetPositionMove readMoveWithGroupValidation(Player player, Team team) {
         while (true) {
             SetPositionMove move = super.readMove(player, team.getSign());
@@ -66,7 +66,7 @@ public class SuperTicTacToe extends Game<XOCell> {
             }
         }
     }
-
+    // print basic information of the board and game, including player info and board info
     private void printBeforeStart(Teams teams) {
         this.iohelper.println("Super TicTacToe Game is starting.....");
         this.iohelper.println("Board is of size: " + this.board.getNumRows() + " x " + board.getNumCols());
@@ -77,7 +77,7 @@ public class SuperTicTacToe extends Game<XOCell> {
         }
         this.iohelper.println(".....");
     }
-
+    // print either win or loos
     public void printAfterTurn(Team team, Status status) {
         switch (status) {
             case WIN:
@@ -92,7 +92,7 @@ public class SuperTicTacToe extends Game<XOCell> {
                 break;
         }
     }
-
+    // print the board
     private void printBoardInGroups() {
         List<List<Cell<XOCell>>> b = this.board.getBoard();
         int n = b.size();
@@ -123,7 +123,7 @@ public class SuperTicTacToe extends Game<XOCell> {
 
         this.iohelper.print(out.toString());
     }
-
+    // print the line that represents upper and lower boarders of each cell
     private String lineGroup(int n) {
         String unit = String.join("", Collections.nCopies(GROUP_SIZE, "+---")) + "+";
         return String.join(" ", Collections.nCopies(n / GROUP_SIZE, unit));

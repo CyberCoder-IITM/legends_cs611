@@ -7,7 +7,7 @@ public class Quoridor extends Game<QuoridorPiece> {
 
     int numPlayers;
     int numWalls;
-
+    // initializer for quoridor class
     public static Quoridor init(int n, int m, int numPlayers, int numWalls) {
         Board<QuoridorPiece> board = new Board<>(2 * n + 1, 2 * m + 1, QuoridorPiece::Empty);
         for (int i = 0; i < 2 * n + 1; i++) {
@@ -28,13 +28,13 @@ public class Quoridor extends Game<QuoridorPiece> {
 
         return new Quoridor(board, new IOHelper(new Scanner(System.in)), numPlayers, numWalls);
     }
-
+    // private quoridor constructor
     private Quoridor(Board<QuoridorPiece> board, IOHelper ioHelper, int numPlayers, int numWalls) {
         super(board, ioHelper);
         this.numPlayers = numPlayers;
         this.numWalls = numWalls;
     }
-
+    // implement quoridor play for game play, rules and logic of the game
     @Override
     public void play() {
         int turn = 0;
@@ -62,7 +62,7 @@ public class Quoridor extends Game<QuoridorPiece> {
             turn++;
         }
     }
-
+    // ask the user if what type of move they want to make, place wall or move pawn
     private void doMove(QuoridorPlayerConfig conf, QuoridorConfig allConfigs) {
         this.iohelper.prompt("Making a move for player:" + conf.getPlayer().getName() + ", pawn:" + conf.getLabel()
                 + ", remaining walls:" + conf.getRemainingWalls());
@@ -83,7 +83,7 @@ public class Quoridor extends Game<QuoridorPiece> {
         }
 
     }
-
+    // logic for placing a wall piece on the board, both validation for position and setting the wall piece
     private void doWallMove(QuoridorPlayerConfig conf, QuoridorConfig allConfigs) {
         String s = this.iohelper
                 .nextLine("Input where the wall should be placed, format: { {number}, {number}, {u/d/r/l} }");
@@ -212,12 +212,12 @@ public class Quoridor extends Game<QuoridorPiece> {
         }
 
     }
-
+    // calling the reachable method to check if players are not blocked and reachable to their wining side
     private boolean reachable(QuoridorPlayerConfig conf) {
         return reachable(conf, conf.getPositionInBoard(board),
                 new Board<>(this.board.getNumRows(), this.board.getNumCols(), () -> false).getBoard());
     }
-
+    // checking if the player could reach their winning side
     private boolean reachable(QuoridorPlayerConfig conf, Position pos, List<List<Cell<Boolean>>> reached) {
         if (hasWall(pos)) {
             return false;
@@ -236,11 +236,11 @@ public class Quoridor extends Game<QuoridorPiece> {
         }
         return false;
     }
-
+    // check if there is a wall at p position
     private boolean hasWall(Position p) {
         return this.board.at(p).getValue().isWall();
     }
-
+    // for validating pawn move, and placing pawn(player).
     private void doPawnMove(QuoridorPlayerConfig conf) {
         Position position = conf.getPositionInBoard(this.board);
         List<Position> valid = allValidPositions(position, Direction.all(), true);
@@ -257,7 +257,7 @@ public class Quoridor extends Game<QuoridorPiece> {
         this.board.set(position, QuoridorPiece.Empty());
         this.board.set(movePosition, QuoridorPiece.Pawn(conf.getLabel()));
     }
-
+    // return a list of all position the pawn(player) could move to
     private List<Position> allValidPositions(Position pos, List<Direction> directions, boolean recurse) {
         List<Position> valid = new ArrayList<>();
         for (Direction d : Direction.all()) {
@@ -275,7 +275,7 @@ public class Quoridor extends Game<QuoridorPiece> {
         }
         return valid;
     }
-
+    // print the quoridor game board with pawns
     protected void printQuoridor() {
         List<List<Cell<QuoridorPiece>>> b = this.board.getBoard();
         int n = b.size();
@@ -312,7 +312,7 @@ public class Quoridor extends Game<QuoridorPiece> {
         int j = (pos.getY() - 1) / 2;
         return (m * i + j + 1);
     }
-
+    // return string representation of pieces
     private String pieceToString(QuoridorPiece c, int i, int j) {
         if (c.isEmpty()) {
             return positionToDisplay(new Position(i, j)) + "";
@@ -322,7 +322,7 @@ public class Quoridor extends Game<QuoridorPiece> {
             return c.toString();
         }
     }
-
+    // return string representation of either wall piece or cell outline
     private String line(List<List<Cell<QuoridorPiece>>> b, int row) {
         int m = b.get(0).size();
         StringBuilder out = new StringBuilder();
@@ -336,7 +336,7 @@ public class Quoridor extends Game<QuoridorPiece> {
         out.append("+");
         return out.toString();
     }
-
+    // print basic game information before game start
     private void printBeforeStart(QuoridorConfig conf) {
         this.iohelper.println("Quoridor Game is starting.....");
         this.iohelper

@@ -6,14 +6,14 @@ import java.util.List;
  * A class to check if there are a certain number of consecutive X or O on the 2D board
  */
 public class Checker {
-
+    // checker constructor
     public Checker() {
     }
-
+    // used to transition from the entire board to list of cells on the board and check the for win condition
     public Status check(Board<XOCell> board, int winCount) {
         return check(board.getBoard(), winCount);
     }
-
+    // check for win of the inputted list of cells
     public Status check(List<List<Cell<XOCell>>> b, int winCount) {
         int n = b.size();
         int m = b.get(0).size();
@@ -97,11 +97,11 @@ public class Checker {
 
         return Status.NONE;
     }
-
+    // check if the cell is either x or o, used for tic-tac-toe, order and chaos, and super tic
     private int value(int i, int j, List<List<Cell<XOCell>>> b) {
         return (b.get(i).get(j).has(XOCell.O) ? 1 : (b.get(i).get(j).has(XOCell.X) ? -1 : 0));
     }
-
+    // check the win condition for small cells on the super tic-tac-toe board
     public Status checkGroups(Board<XOCell> board, int groupSize, int winCount) {
         List<List<Cell<XOCell>>> boardGroup = new ArrayList<>();
         int n = board.getBoard().size();

@@ -9,16 +9,17 @@ public class OrderAndChaos extends Game<XOCell> {
     private static final int WIN_COUNT = 5;
     private static final int NUM_ROWS = 6;
     private static final int NUM_COLS = 6;
-
+    // initializer
     public static OrderAndChaos init() {
         return new OrderAndChaos();
     }
-
+    // constructor
     private OrderAndChaos() {
         super(new Board<>(NUM_ROWS, NUM_COLS, () -> XOCell.EMPTY), new IOHelper(new Scanner(System.in)));
         this.checker = new Checker();
     }
-
+    // implement the play method that is inherited from the game class
+    // this is used for playing the game of order and chaos
     @Override
     public void play() {
         int turn = 0;
@@ -44,7 +45,7 @@ public class OrderAndChaos extends Game<XOCell> {
             turn++;
         }
     }
-
+    // print the game information before the game play
     private void printBeforeStart(TwoPlayer players) {
         this.iohelper.println("Order and Chaos is starting.....");
         this.iohelper.println("Board is of size: " + board.getNumRows() + " x " + board.getNumCols());
@@ -52,7 +53,8 @@ public class OrderAndChaos extends Game<XOCell> {
                 "Two players " + players.getP1() + " and " + players.getP2() + " are playing");
         this.iohelper.println(".....");
     }
-
+    // print the winner or loose
+    // this if for end of the game, either win or loss
     public void printAfterTurn(Player player, Status status) {
         switch (status) {
             case WIN:

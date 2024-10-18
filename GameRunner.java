@@ -7,7 +7,8 @@ public class GameRunner {
 
     private GameRunner() {
     }
-
+    // ask the player for the game they want to play, and what board size they want for their chosen game
+    // then create game object and start the game
     public static void run() {
         IOHelper helper = new IOHelper(new Scanner(System.in));
         helper.prompt("Hello! Lets play a game.");
@@ -23,19 +24,25 @@ public class GameRunner {
 
             if (num == 1) {
                 helper.println("You have selected Tic Tac Toe");
-                int rows = helper.nextLineInt("number of rows: ", "input should be an integer");
-                int cols = helper.nextLineInt("number of cols: ", "input should be an integer");
-                int win = helper.nextLineInt("number of consecutive X or O to win: ", "input should be an integer");
+                int rows = helper.nextLineInt("number of rows: ", "input should be an integer",
+                        i -> i >= 3 , "should be at least 3");
+                int cols = helper.nextLineInt("number of cols: ", "input should be an integer",
+                        i -> i >= 3, "should be at least 3");
+                int win = helper.nextLineInt("number of consecutive X or O to win: ", "input should be an integer",
+                        i -> i >= 3, "should be at least 3");
                 TicTacToe.init(rows, cols, win).play();
             } else if (num == 2) {
                 helper.println("You have selected Order and Chaos");
                 OrderAndChaos.init().play();
             } else if (num == 3) {
                 helper.println("You have selected Super Tic Tac Toe");
-                int rows = helper.nextLineInt("number of Tic Tac Toe's in a row: ", "input should be an integer");
-                int cols = helper.nextLineInt("number of Tic Tac Toe's in a colum: ", "input should be an integer");
+                int rows = helper.nextLineInt("number of Tic Tac Toe's in a row: ", "input should be an integer",
+                        i -> i >=3, "should be at least 3");
+                int cols = helper.nextLineInt("number of Tic Tac Toe's in a colum: ", "input should be an integer",
+                        i -> i >=3, "should be at least 3");
                 int win = helper.nextLineInt("number of consecutive Tic Tac Toe's needed to win: ",
-                        "input should be an integer");
+                        "input should be an integer",
+                        i -> i >= 3, "should be at least 3");
                 SuperTicTacToe.init(rows, cols, win).play();
             } else if (num == 4) {
                 helper.println("You have selected Quoridor");

@@ -24,13 +24,13 @@ public class IOHelper {
     public IOHelper(Scanner in) {
         this.in = in;
     }
-
+    // take string input with specific prompt
     public String nextLine(String prompt) {
         this.prompt(prompt);
         this.waitInput();
         return in.nextLine();
     }
-
+    // check if the user input is a valid string, if not then print the specified error message
     public String nextLine(String prompt, String err, Predicate<String> f) {
         while (true) {
             String s = nextLine(prompt);
@@ -41,7 +41,7 @@ public class IOHelper {
             }
         }
     }
-
+    // check if the user input is an integer value or not, if not print the specified error message
     public int nextLineInt(String prompt, String err) {
         while (true) {
             this.prompt(prompt);
@@ -54,7 +54,7 @@ public class IOHelper {
             }
         }
     }
-
+    // used to take integer input that represents the game chosen
     public int nextLineInt(String err) {
         while (true) {
             try {
@@ -66,27 +66,27 @@ public class IOHelper {
             }
         }
     }
-
+    // print string in green color in the terminal
     public void println(String s) {
         System.out.println(ANSI_GREEN + s + ANSI_RESET);
     }
-
+    // print string in red color in the terminal
     public void printErr(String s) {
         System.out.println(ANSI_RED + s + ANSI_RESET + BELL);
     }
-
+    // print string without color or any other format
     public void print(String s) {
         System.out.print(s);
     }
-
+    // printing game prompt in yellow
     public void prompt(String s) {
         this.println(ANSI_YELLOW + "[+] " + s + ANSI_RESET);
     }
-
+    // print wait input in blue
     public void waitInput() {
         this.print(ANSI_BLUE + ">> " + ANSI_RESET);
     }
-
+    // get user input, while having multiple type of error message
     public int nextLineInt(String prompt, String err, Predicate<Integer> fn, String err2) {
         while (true) {
             int i = nextLineInt(prompt, err);

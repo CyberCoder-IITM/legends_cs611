@@ -9,18 +9,18 @@ public class TicTacToe extends Game<XOCell> {
     private int winCount;
     private Checker checker;
     private Random rand;
-
+    // initializer
     public static TicTacToe init(int n, int m, int c) {
         return new TicTacToe(new Board<>(n, m, () -> XOCell.EMPTY), c, new IOHelper(new Scanner(System.in)));
     }
-
+    // constructor
     private TicTacToe(Board<XOCell> b, int c, IOHelper helper) {
         super(b, helper);
         this.checker = new Checker();
         this.rand = new Random();
         this.winCount = c;
     }
-
+    // game logic, rule and logic for tic tac toe
     @Override
     public void play() {
         int turn = 0;
@@ -44,7 +44,7 @@ public class TicTacToe extends Game<XOCell> {
             turn++;
         }
     }
-
+    // print game information before the start of the game
     private void printBeforeStart(Teams teams) {
         this.iohelper.println("TicTacToe Game is starting.....");
         this.iohelper.println("Board is of size: " + this.board.getNumRows() + " x " + board.getNumCols());
@@ -55,7 +55,7 @@ public class TicTacToe extends Game<XOCell> {
         }
         this.iohelper.println(".....");
     }
-
+    // print the winner or of the game ended
     public void printAfterTurn(Team team, Status status) {
         switch (status) {
             case WIN:

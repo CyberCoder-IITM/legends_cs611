@@ -5,12 +5,14 @@ import java.util.stream.Collectors;
 public class QuoridorConfig {
     int numPlayers;
     List<QuoridorPlayerConfig> confs;
-
+    // constructor
     public QuoridorConfig(int numPlayers, List<QuoridorPlayerConfig> confs) {
         this.numPlayers = numPlayers;
         this.confs = confs;
     }
-
+    // initialization basic configuration for quoridor game
+    // get the row and cols of the board, the num of players and num of walls,
+    // also specify the player's starting position
     public static <T> QuoridorConfig init(int numPlayers, int numWalls, Board<T> b, IOHelper helper) {
         int n = b.getNumRows();
         int m = b.getNumRows();
@@ -32,12 +34,13 @@ public class QuoridorConfig {
                             (i, j) -> j == m - 2)));
         }
     }
-
+    // get name for player
+    // create player object
     private static Player readPlayer(IOHelper ioHelper, int i) {
         String name = ioHelper.nextLine("name of player " + (i + 1) + ": ");
         return new Player(name);
     }
-
+    // get the list of players
     public List<Player> getPlayers() {
         return this.confs.stream().map(QuoridorPlayerConfig::getPlayer).collect(Collectors.toList());
     }
@@ -45,11 +48,11 @@ public class QuoridorConfig {
     public Player getPlayerForTurn(int turn) {
         return this.getPlayers().get(turn % this.numPlayers);
     }
-
+    // list the player configuration
     public List<QuoridorPlayerConfig> getConfigs() {
         return this.confs;
     }
-
+    // get the configuration for rand player based on turn.
     public QuoridorPlayerConfig getForTurn(int turn) {
         return this.getConfigs().get(turn % this.numPlayers);
     }

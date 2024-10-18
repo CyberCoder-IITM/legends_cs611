@@ -10,15 +10,15 @@ public class SetPositionMove {
         this.postion = postion;
         this.value = value;
     }
-
+    // return position
     public Position getPostion() {
         return postion;
     }
-
+    // return value (XO cell)
     public XOCell getValue() {
         return value;
     }
-
+    // sets the game piece at position on the board
     public void doAction(Board<XOCell> b) {
         b.set(postion, value);
     }
