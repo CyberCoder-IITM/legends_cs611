@@ -30,16 +30,17 @@ This section should be all of the source code files that have a .java extension.
 **Checker.java**                - Checks the status of the game\
 **IOHelper.java**               - A helper to manage all IO Operations\
 \
+**QuoridorConfig.java**         - Configurations for the Quoridor game \
+**QuoridorPiece.java**          - The cells of either Pawn, Wall, Empty\
+**QuoridorPieceType.java**      - Enumerator for types of quoridor pieces\
+**QuoridorPlayerConfig.java**   - configuration for quoridor players\
+**Direction.java**              - the direction for the wall placement\
+
+\
 **TicTacToe.java**              - Extends the Game class and encapsulates the Tic Tac Toe game\
 **OrderAndChaos.java**          - Extends the Game class and encapsulates the Order and Chaos game\
-**SuperTicTacToe.java**         - Extends the Game class and encapsulates the Super Tic Tac Toe game
-\
-**Quoridor.java**                    - Extends the Game class and encapsulates the Quoridor game\
-**QuoridorConfig.java**              - Configurations for the Quoridor game \
-**QuoridorPiece.java**               - The cells of either Pawn, Wall, Empty\
-**QuoridorPieceType.java**           - Enumerator for types of quoridor pieces\
-**QuoridorPlayerConfig.java**        - configuration for quoridor players\
-**Direction.java**                        - the direction for the wall placement\
+**SuperTicTacToe.java**         - Extends the Game class and encapsulates the Super Tic Tac Toe game\
+**Quoridor.java**               - Extends the Game class and encapsulates the Quoridor game
 
 
 ## Notes
@@ -66,6 +67,10 @@ This section should be all of the source code files that have a .java extension.
     - Teams, players and thier symbols are customizable
     - Each cell is numbered which makes selecting it easier
     - Game ends when certain number of Tic Tac Toe boards are won by a team/symbol
+- For the game Quoridor:
+    - Number of rows and colums are customizable
+    - Number of players can be 2 or 4
+    - Number of walls each player get is customizable
 - Console output is colored(only in terminals which support ANSI escape codes)
     - Errors are in red
     - Prompts are in yellow
