@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="d6339476-3661-4ebe-b67d-be87dce33984" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/legends.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/Board.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cell.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Checker.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Game.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GameRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/GameRunner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OrderAndChaos.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Player.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Quoridor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuoridorConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuoridorPiece.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuoridorPieceType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/QuoridorPlayerConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SetPositionMove.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Status.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SuperTicTacToe.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Team.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Teams.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TestChecker.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TicTacToe.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TwoPlayer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/XOCell.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tictactoe_A3.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/uml.jpeg" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 0
+}]]></component>
+  <component name="ProjectId" id="2oSMh14qRkivz7b3r4qF7Q0C0lY" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/sundeep/Documents/Masters/cs611/legends",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23726.103" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23726.103" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d6339476-3661-4ebe-b67d-be87dce33984" name="Changes" comment="" />
+      <created>1730858639410</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1730858639410</updated>
+      <workItem from="1730858640555" duration="73000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

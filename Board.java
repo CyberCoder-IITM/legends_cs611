@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 public class Board<T> {
     private int n;
     private int m;
-    private List<List<Cell<T>>> board;
+    private List<List<Cell2D<T>>> board;
 
     // Constructor for board, n and m are the col and row of the board
     public Board(int n, int m, Supplier<T> f) {
@@ -17,39 +17,43 @@ public class Board<T> {
         this.m = m;
         this.board = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            List<Cell<T>> row = new ArrayList<>();
+            List<Cell2D<T>> row = new ArrayList<>();
             for (int j = 0; j < m; j++) {
-                row.add(new Cell<>(f.get()));
+                row.add(new Cell2D<>(f.get()));
             }
             this.board.add(row);
         }
     }
+
     // constructor for the board
-    public Board(List<List<Cell<T>>> board) {
+    public Board(List<List<Cell2D<T>>> board) {
         this.board = board;
         this.n = board.size();
         this.m = board.get(0).size();
     }
+
     // get the row num for the board
     public int getNumRows() {
         return n;
     }
+
     // get the col num for the board
     public int getNumCols() {
         return m;
     }
+
     // places the pawns/ walls/ other game pieces on the board
     public void set(Position p, T value) {
         if (!isValid(p)) {
             throw new IllegalArgumentException("position is not valid");
         }
-        this.board.get(p.getX()).set(p.getY(), new Cell<>(value));
+        this.board.get(p.getX()).set(p.getY(), new Cell2D<>(value));
     }
 
-    private List<List<Cell<T>>> copy(int fromI, int toI, int fromJ, int toJ) {
-        List<List<Cell<T>>> boardCopy = new ArrayList<>();
+    private List<List<Cell2D<T>>> copy(int fromI, int toI, int fromJ, int toJ) {
+        List<List<Cell2D<T>>> boardCopy = new ArrayList<>();
         for (int i = fromI; i < toI; i++) {
-            List<Cell<T>> row = new ArrayList<>();
+            List<Cell2D<T>> row = new ArrayList<>();
             for (int j = fromJ; j < toJ; j++) {
                 row.add(this.board.get(i).get(j));
             }
@@ -57,24 +61,27 @@ public class Board<T> {
         }
         return boardCopy;
     }
+
     // return the copy of the current board
-    public List<List<Cell<T>>> getBoard() {
+    public List<List<Cell2D<T>>> getBoard() {
         return copy(0, n, 0, m);
     }
 
-    public List<List<Cell<T>>> getGroupFor(int x, int y, int groupSize) {
+    public List<List<Cell2D<T>>> getGroupFor(int x, int y, int groupSize) {
         int fromI = (x / groupSize) * groupSize;
         int toI = fromI + groupSize;
         int fromJ = (y / groupSize) * groupSize;
         int toJ = fromJ + groupSize;
         return copy(fromI, toI, fromJ, toJ);
     }
+
     // checks if the entered position is on the board or not
     public boolean isValid(Position p) {
         return p.getX() >= 0 && p.getX() < n && p.getY() >= 0 && p.getY() < m;
     }
+
     // get the cell at specific position
-    public Cell<T> at(Position p) {
+    public Cell2D<T> at(Position p) {
         return this.board.get(p.getX()).get(p.getY());
     }
 
