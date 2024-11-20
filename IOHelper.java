@@ -5,8 +5,9 @@ import java.util.function.Predicate;
 /*
  * A simple helper for all IO operations
  */
-public class IOHelper {
 
+public class IOHelper {
+    // ANSI color codes for terminal output
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
     public static final String ANSI_RED = "\u001B[31m";
@@ -16,32 +17,34 @@ public class IOHelper {
     public static final String ANSI_PURPLE = "\u001B[35m";
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
-
     public static final String BELL = "\u0007";
 
-    Scanner in;
+    private Scanner in;
 
     public IOHelper(Scanner in) {
         this.in = in;
     }
-    // take string input with specific prompt
+
+    // Get string input with specific prompt
     public String nextLine(String prompt) {
         this.prompt(prompt);
         this.waitInput();
         return in.nextLine();
     }
-    // check if the user input is a valid string, if not then print the specified error message
-    public String nextLine(String prompt, String err, Predicate<String> f) {
+
+    // Get validated string input
+    public String nextLine(String prompt, String err, Predicate<String> validator) {
         while (true) {
             String s = nextLine(prompt);
-            if (f.test(s)) {
+            if (validator.test(s)) {
                 return s;
             } else {
                 this.printErr(err);
             }
         }
     }
-    // check if the user input is an integer value or not, if not print the specified error message
+
+    // Get integer input with validation
     public int nextLineInt(String prompt, String err) {
         while (true) {
             this.prompt(prompt);
@@ -54,7 +57,8 @@ public class IOHelper {
             }
         }
     }
-    // used to take integer input that represents the game chosen
+
+    // Get integer input for game choices
     public int nextLineInt(String err) {
         while (true) {
             try {
@@ -66,36 +70,77 @@ public class IOHelper {
             }
         }
     }
-    // print string in green color in the terminal
-    public void println(String s) {
-        System.out.println(ANSI_GREEN + s + ANSI_RESET);
-    }
-    // print string in red color in the terminal
-    public void printErr(String s) {
-        System.out.println(ANSI_RED + s + ANSI_RESET + BELL);
-    }
-    // print string without color or any other format
-    public void print(String s) {
-        System.out.print(s);
-    }
-    // printing game prompt in yellow
-    public void prompt(String s) {
-        this.println(ANSI_YELLOW + "[+] " + s + ANSI_RESET);
-    }
-    // print wait input in blue
-    public void waitInput() {
-        this.print(ANSI_BLUE + ">> " + ANSI_RESET);
-    }
-    // get user input, while having multiple type of error message
-    public int nextLineInt(String prompt, String err, Predicate<Integer> fn, String err2) {
+
+    // Add this specific method for integer input with validation
+    public int nextLineInt(String prompt, String err, Predicate<Integer> validator) {
         while (true) {
-            int i = nextLineInt(prompt, err);
-            if (fn.test(i)) {
-                return i;
-            } else {
-                this.printErr(err2);
+            try {
+                this.prompt(prompt);
+                this.waitInput();
+                String input = in.nextLine();
+                int value = Integer.parseInt(input);
+                if (validator.test(value)) {
+                    return value;
+                } else {
+                    this.printErr(err);
+                }
+            } catch (NumberFormatException e) {
+                this.printErr(err);
             }
         }
     }
 
+    // Get validated integer input within range
+
+    // Display methods with different colors
+    public void println(String s) {
+        System.out.println(ANSI_GREEN + s + ANSI_RESET);
+    }
+
+    public void printErr(String s) {
+        System.out.println(ANSI_RED + s + ANSI_RESET + BELL);
+    }
+
+    public void print(String s) {
+        System.out.print(s);
+    }
+
+    public void prompt(String s) {
+        System.out.println(ANSI_YELLOW + "[+] " + s + ANSI_RESET);
+    }
+
+    public void waitInput() {
+        System.out.print(ANSI_BLUE + ">> " + ANSI_RESET);
+    }
+
+    private String getCellSymbol(CellType cellType) {
+        switch(cellType) {
+            case NEXUS: return "N";
+            case INACCESSIBLE: return "I";
+            case BUSH: return "B";
+            case CAVE: return "C";
+            case KOULOU: return "K";
+            case PLAIN: return "P";
+            default: return " ";
+        }
+    }
+
+
+    public void displayGameControls() {
+        println("\n=== Controls ===");
+        println("W/A/S/D - Move");
+        println("T - Teleport");
+        println("R - Recall");
+        println("I - Inventory");
+        println("M - Market (at Nexus only)");
+        println("Q - Quit game");
+    }
+
+    public void displayCombatResult(String attacker, String defender, double damage, boolean dodged) {
+        if (dodged) {
+            println(defender + " dodged " + attacker + "'s attack!");
+        } else {
+            println(attacker + " dealt " + damage + " damage to " + defender);
+        }
+    }
 }

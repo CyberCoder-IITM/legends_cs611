@@ -2,61 +2,85 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d6339476-3661-4ebe-b67d-be87dce33984" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/legends.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GameDifficulty.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lane.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Spell.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SpellEffect.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TerrainEffect.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AllFightStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/AllFightStrategy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/App.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Armor.java" beforeDir="false" afterPath="$PROJECT_DIR$/Armor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/Board.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cell.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Checker.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Game.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cell2D.java" beforeDir="false" afterPath="$PROJECT_DIR$/Cell2D.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CellType.java" beforeDir="false" afterPath="$PROJECT_DIR$/CellType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FightStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/FightStrategy.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GameRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/GameRunner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OrderAndChaos.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Player.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Quoridor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/QuoridorConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/QuoridorPiece.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/QuoridorPieceType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/QuoridorPlayerConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SetPositionMove.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Status.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SuperTicTacToe.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Team.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Teams.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TestChecker.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TicTacToe.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TwoPlayer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/XOCell.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tictactoe_A3.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/uml.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Hero.java" beforeDir="false" afterPath="$PROJECT_DIR$/Hero.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HeroParty.java" beforeDir="false" afterPath="$PROJECT_DIR$/HeroParty.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HeroStats.java" beforeDir="false" afterPath="$PROJECT_DIR$/HeroStats.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Heroes.java" beforeDir="false" afterPath="$PROJECT_DIR$/Heroes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IOHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/IOHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Item.java" beforeDir="false" afterPath="$PROJECT_DIR$/Item.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Items.java" beforeDir="false" afterPath="$PROJECT_DIR$/Items.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Legends.java" beforeDir="false" afterPath="$PROJECT_DIR$/Legends.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Market.java" beforeDir="false" afterPath="$PROJECT_DIR$/Market.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Monster.java" beforeDir="false" afterPath="$PROJECT_DIR$/Monster.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MonsterFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/MonsterFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MonsterParty.java" beforeDir="false" afterPath="$PROJECT_DIR$/MonsterParty.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Monsters.java" beforeDir="false" afterPath="$PROJECT_DIR$/Monsters.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Move.java" beforeDir="false" afterPath="$PROJECT_DIR$/Move.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Position.java" beforeDir="false" afterPath="$PROJECT_DIR$/Position.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Potion.java" beforeDir="false" afterPath="$PROJECT_DIR$/Potion.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PotionType.java" beforeDir="false" afterPath="$PROJECT_DIR$/PotionType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RandomMonsterFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/RandomMonsterFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Weapon.java" beforeDir="false" afterPath="$PROJECT_DIR$/Weapon.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WorldGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/WorldGenerator.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+        <option value="Enum" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 0
-}]]></component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="ProjectId" id="2oSMh14qRkivz7b3r4qF7Q0C0lY" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/sundeep/Documents/Masters/cs611/legends",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
-  }
-}]]></component>
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$USER_HOME$/Desktop/Masters Related Docs/Assignments" />
+  </component>
+  <component name="RunManager">
+    <configuration name="App" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="App" />
+      <module name="legends" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -79,5 +103,16 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

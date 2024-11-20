@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="d6339476-3661-4ebe-b67d-be87dce33984" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/GameDifficulty.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Lane.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Spell.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SpellEffect.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TerrainEffect.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AllFightStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/AllFightStrategy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/App.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Armor.java" beforeDir="false" afterPath="$PROJECT_DIR$/Armor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/Board.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cell2D.java" beforeDir="false" afterPath="$PROJECT_DIR$/Cell2D.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CellType.java" beforeDir="false" afterPath="$PROJECT_DIR$/CellType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FightStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/FightStrategy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GameRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/GameRunner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Hero.java" beforeDir="false" afterPath="$PROJECT_DIR$/Hero.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HeroParty.java" beforeDir="false" afterPath="$PROJECT_DIR$/HeroParty.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HeroStats.java" beforeDir="false" afterPath="$PROJECT_DIR$/HeroStats.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Heroes.java" beforeDir="false" afterPath="$PROJECT_DIR$/Heroes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IOHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/IOHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Item.java" beforeDir="false" afterPath="$PROJECT_DIR$/Item.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Items.java" beforeDir="false" afterPath="$PROJECT_DIR$/Items.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Legends.java" beforeDir="false" afterPath="$PROJECT_DIR$/Legends.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Market.java" beforeDir="false" afterPath="$PROJECT_DIR$/Market.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Monster.java" beforeDir="false" afterPath="$PROJECT_DIR$/Monster.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MonsterFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/MonsterFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MonsterParty.java" beforeDir="false" afterPath="$PROJECT_DIR$/MonsterParty.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Monsters.java" beforeDir="false" afterPath="$PROJECT_DIR$/Monsters.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Move.java" beforeDir="false" afterPath="$PROJECT_DIR$/Move.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Position.java" beforeDir="false" afterPath="$PROJECT_DIR$/Position.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Potion.java" beforeDir="false" afterPath="$PROJECT_DIR$/Potion.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PotionType.java" beforeDir="false" afterPath="$PROJECT_DIR$/PotionType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RandomMonsterFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/RandomMonsterFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Weapon.java" beforeDir="false" afterPath="$PROJECT_DIR$/Weapon.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WorldGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/WorldGenerator.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+        <option value="Enum" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2oSMh14qRkivz7b3r4qF7Q0C0lY" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$USER_HOME$/Desktop/Masters Related Docs/Assignments" />
+  </component>
+  <component name="RunManager">
+    <configuration name="App" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="App" />
+      <module name="legends" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23726.103" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23726.103" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d6339476-3661-4ebe-b67d-be87dce33984" name="Changes" comment="" />
+      <created>1730858639410</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1730858639410</updated>
+      <workItem from="1730858640555" duration="73000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

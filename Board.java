@@ -1,88 +1,209 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Supplier;
 
 /*
  * A 2D board of size n x m with cells in it
  * Generic class for board
- */
-public class Board<T> {
-    private int n;
-    private int m;
-    private List<List<Cell2D<T>>> board;
+*/
 
-    // Constructor for board, n and m are the col and row of the board
-    public Board(int n, int m, Supplier<T> f) {
-        this.n = n;
-        this.m = m;
+public class Board<T> {
+    private int rows;
+    private int cols;
+    private List<List<Cell2D<T>>> board;
+    private Map<Position, Hero> heroPositions;
+    private Map<Position, Monster> monsterPositions;
+    private Map<Position, TerrainEffect> terrainEffects;
+    private Supplier<T> defaultValueSupplier;  // Add this field
+
+
+    private static final int BOARD_SIZE = 8;
+    private static final int[] LANE_DIVIDERS = {2, 5};
+    private static final double SPECIAL_SPACE_PERCENTAGE = 0.20; // 20% for each special space
+
+    public Board(int rows, int cols, Supplier<T> defaultValueSupplier) {
+        this.rows = rows;
+        this.cols = cols;
+        this.defaultValueSupplier = defaultValueSupplier;
+        this.heroPositions = new HashMap<>();
+        this.monsterPositions = new HashMap<>();
+        this.terrainEffects = new HashMap<>();
+        initializeBoard();
+    }
+
+    private void initializeBoard() {
         this.board = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < rows; i++) {
             List<Cell2D<T>> row = new ArrayList<>();
-            for (int j = 0; j < m; j++) {
-                row.add(new Cell2D<>(f.get()));
+            for (int j = 0; j < cols; j++) {
+                row.add(new Cell2D<>(defaultValueSupplier.get()));
             }
             this.board.add(row);
         }
+
+        // Set Nexus rows
+        for (int j = 0; j < cols; j++) {
+            set(new Position(0, j), (T)CellType.NEXUS);    // Monster Nexus
+            set(new Position(rows-1, j), (T)CellType.NEXUS); // Hero Nexus
+        }
+
+        // Set inaccessible columns
+        for (int i = 0; i < rows; i++) {
+            for (int divider : LANE_DIVIDERS) {
+                set(new Position(i, divider), (T)CellType.INACCESSIBLE);
+            }
+        }
+
+        // Distribute terrain types
+        distributeTerrainTypes();
     }
 
-    // constructor for the board
-    public Board(List<List<Cell2D<T>>> board) {
-        this.board = board;
-        this.n = board.size();
-        this.m = board.get(0).size();
+    private void distributeTerrainTypes() {
+        List<Position> availablePositions = new ArrayList<>();
+
+        // Collect available positions (excluding nexus and inaccessible)
+        for (int i = 1; i < rows-1; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (!isInaccessible(new Position(i, j))) {
+                    availablePositions.add(new Position(i, j));
+                }
+            }
+        }
+
+        Collections.shuffle(availablePositions);
+        int totalSpaces = availablePositions.size();
+        int specialSpaces = (int)(totalSpaces * SPECIAL_SPACE_PERCENTAGE);
+
+        // Distribute Bush spaces
+        for (int i = 0; i < specialSpaces; i++) {
+            Position pos = availablePositions.remove(0);
+            set(pos, (T)CellType.BUSH);
+            terrainEffects.put(pos, new TerrainEffect(CellType.BUSH));
+        }
+
+        // Distribute Cave spaces
+        for (int i = 0; i < specialSpaces; i++) {
+            Position pos = availablePositions.remove(0);
+            set(pos, (T)CellType.CAVE);
+            terrainEffects.put(pos, new TerrainEffect(CellType.CAVE));
+        }
+
+        // Distribute Koulou spaces
+        for (int i = 0; i < specialSpaces; i++) {
+            Position pos = availablePositions.remove(0);
+            set(pos, (T)CellType.KOULOU);
+            terrainEffects.put(pos, new TerrainEffect(CellType.KOULOU));
+        }
+
+        // Remaining spaces stay as Plain
     }
 
-    // get the row num for the board
-    public int getNumRows() {
-        return n;
-    }
-
-    // get the col num for the board
-    public int getNumCols() {
-        return m;
-    }
-
-    // places the pawns/ walls/ other game pieces on the board
     public void set(Position p, T value) {
         if (!isValid(p)) {
-            throw new IllegalArgumentException("position is not valid");
+            throw new IllegalArgumentException("Invalid position");
         }
-        this.board.get(p.getX()).set(p.getY(), new Cell2D<>(value));
+        board.get(p.getX()).set(p.getY(), new Cell2D<>(value));
     }
 
-    private List<List<Cell2D<T>>> copy(int fromI, int toI, int fromJ, int toJ) {
-        List<List<Cell2D<T>>> boardCopy = new ArrayList<>();
-        for (int i = fromI; i < toI; i++) {
-            List<Cell2D<T>> row = new ArrayList<>();
-            for (int j = fromJ; j < toJ; j++) {
-                row.add(this.board.get(i).get(j));
-            }
-            boardCopy.add(row);
-        }
-        return boardCopy;
-    }
-
-    // return the copy of the current board
-    public List<List<Cell2D<T>>> getBoard() {
-        return copy(0, n, 0, m);
-    }
-
-    public List<List<Cell2D<T>>> getGroupFor(int x, int y, int groupSize) {
-        int fromI = (x / groupSize) * groupSize;
-        int toI = fromI + groupSize;
-        int fromJ = (y / groupSize) * groupSize;
-        int toJ = fromJ + groupSize;
-        return copy(fromI, toI, fromJ, toJ);
-    }
-
-    // checks if the entered position is on the board or not
-    public boolean isValid(Position p) {
-        return p.getX() >= 0 && p.getX() < n && p.getY() >= 0 && p.getY() < m;
-    }
-
-    // get the cell at specific position
     public Cell2D<T> at(Position p) {
-        return this.board.get(p.getX()).get(p.getY());
+        return board.get(p.getX()).get(p.getY());
     }
 
+    public boolean isValid(Position p) {
+        return p.getX() >= 0 && p.getX() < rows &&
+                p.getY() >= 0 && p.getY() < cols;
+    }
+
+    public boolean isInaccessible(Position p) {
+        return Arrays.asList(LANE_DIVIDERS).contains(p.getY());
+    }
+
+    public boolean isNexus(Position p) {
+        return p.getX() == 0 || p.getX() == rows - 1;
+    }
+
+    public boolean isHeroNexus(Position p) {
+        return p.getX() == rows - 1;
+    }
+
+    public boolean isMonsterNexus(Position p) {
+        return p.getX() == 0;
+    }
+
+    public void placeHero(Position p, Hero hero) {
+        heroPositions.put(p, hero);
+    }
+
+    public void placeMonster(Position p, Monster monster) {
+        monsterPositions.put(p, monster);
+    }
+
+    public void removeHero(Position p) {
+        heroPositions.remove(p);
+    }
+
+    public void removeMonster(Position p) {
+        monsterPositions.remove(p);
+    }
+
+    public boolean hasHero(Position p) {
+        return heroPositions.containsKey(p);
+    }
+
+    public boolean hasMonster(Position p) {
+        return monsterPositions.containsKey(p);
+    }
+
+    public void applyTerrainEffect(Position pos, Hero hero) {
+        TerrainEffect effect = terrainEffects.get(pos);
+        if (effect != null) {
+            effect.applyEffect(hero);
+        }
+    }
+
+    public void removeTerrainEffect(Position pos, Hero hero) {
+        TerrainEffect effect = terrainEffects.get(pos);
+        if (effect != null) {
+            effect.removeEffect(hero);
+        }
+    }
+
+    public void display() {
+        System.out.println("\nCurrent Board State:");
+        System.out.println("N: Nexus  I: Inaccessible  B: Bush  C: Cave  K: Koulou  P: Plain");
+        System.out.println("H1/H2/H3: Heroes   M1/M2/M3: Monsters   X: Combat");
+        System.out.println("   0 1 2 3 4 5 6 7");
+        System.out.println("  ----------------");
+        for (int i = 0; i < rows; i++) {
+            System.out.print(i + " |");
+            for (int j = 0; j < cols; j++) {
+                Position pos = new Position(i, j);
+                if (hasHero(pos) && hasMonster(pos)) {
+                    System.out.print("X ");
+                } else if (hasHero(pos)) {
+                    Hero hero = heroPositions.get(pos);
+                    System.out.print("H" + hero.getName().charAt(0) + " ");
+                } else if (hasMonster(pos)) {
+                    Monster monster = monsterPositions.get(pos);
+                    System.out.print("M" + monster.getName().charAt(0) + " ");
+                } else {
+                    CellType cellType = (CellType)at(pos).getValue();
+                    System.out.print(getCellSymbol(cellType) + " ");
+                }
+            }
+            System.out.println("|");
+        }
+        System.out.println("  ----------------");
+    }
+
+    private String getCellSymbol(CellType cellType) {
+        switch(cellType) {
+            case NEXUS: return "N";
+            case INACCESSIBLE: return "I";
+            case BUSH: return "B";
+            case CAVE: return "C";
+            case KOULOU: return "K";
+            case PLAIN: return "P";
+            default: return " ";
+        }
+    }
 }

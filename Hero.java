@@ -1,14 +1,7 @@
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-
+import java.util.*;
 /*
  * Represents a hero
- */
+// */
 public class Hero {
     private String name;
     private HeroType type;
@@ -16,12 +9,19 @@ public class Hero {
     private int exp;
     private HeroStats stats;
     private int gold;
-
     private Set<Item> inventory;
-    private Map<EquipmentSlot, Item> equippedItems;
+//    private Map<EquipmentSlot, Item> equippedItems;
+protected Map<EquipmentSlot, Item> equippedItems;
+    private Position currentPosition;
+    private Position nexusPosition;
+    private Lane assignedLane;
+    private boolean inCombat;
+    private static final double RESTORE_RATE = 0.10; // 10% restoration
 
-    public Hero(String name, HeroType type, int level, int exp, HeroStats stats, int gold, Set<Item> inventory,
-            Map<EquipmentSlot, Item> equippedItems) {
+    public Hero(String name, HeroType type, int level, int exp, HeroStats stats,
+                int gold, Set<Item> inventory, Map<EquipmentSlot, Item> equippedItems,
+                Position nexusPosition, Lane lane) {
+        this.inCombat = false;
         this.name = name;
         this.type = type;
         this.level = level;
@@ -30,151 +30,295 @@ public class Hero {
         this.gold = gold;
         this.inventory = inventory;
         this.equippedItems = equippedItems;
+        this.currentPosition = nexusPosition;
+        this.nexusPosition = nexusPosition;
+        this.assignedLane = lane;
     }
 
-    public Hero(String name, HeroType type, int level, int exp, double hp, double mp, double str, double agi,
-            double dex, int gold) {
-        this.name = name;
-        this.type = type;
-        this.level = level;
-        this.exp = exp;
-        this.stats = new HeroStats(hp, mp, str, agi, dex);
-        this.gold = gold;
-        this.inventory = new HashSet<>();
-        this.equippedItems = new HashMap<>();
+    // Basic getters
+    public String getName() { return name; }
+    public HeroType getType() { return type; }
+    public int getLevel() { return level; }
+    public int getExp() { return exp; }
+    public HeroStats getStats() { return stats; }
+    public int getGold() { return gold; }
+    public Set<Item> getInventory() { return inventory; }
+    public Collection<Item> getEquippedItems() { return equippedItems.values(); }
+    public Position getCurrentPosition() { return currentPosition; }
+    public Position getNexusPosition() { return nexusPosition; }
+    public Lane getAssignedLane() { return assignedLane; }
+
+    // Movement methods
+    public boolean move(Direction direction, Board<CellType> board) {
+        Position newPosition = currentPosition.move(direction);
+
+        if (!isValidMove(newPosition, board)) {
+            return false;
+        }
+
+        // Remove current terrain effects
+        board.removeTerrainEffect(currentPosition, this);
+
+        // Update position
+        currentPosition = newPosition;
+
+        // Apply new terrain effects
+        board.applyTerrainEffect(currentPosition, this);
+
+        return true;
     }
 
-    public String getName() {
-        return name;
+    public boolean isInCombat() {
+        // Check if there are any monsters in attack range
+        if (assignedLane != null) {
+            List<Monster> nearbyMonsters = assignedLane.getMonstersInRange(currentPosition);
+            return !nearbyMonsters.isEmpty();
+        }
+        return false;
     }
 
-    public HeroType getType() {
-        return type;
+    public void setInCombat(boolean inCombat) {
+        this.inCombat = inCombat;
     }
 
-    public int getLevel() {
-        return level;
+
+    public boolean doItemAction(Item item) {
+        if (!canUseItem(item)) {
+            return false;
+        }
+
+        switch (item.getType()) {
+            case WEAPON:
+                return equip((Weapon) item);
+            case ARMOR:
+                return equip((Armor) item);
+            case POTION:
+                return ((Potion) item).action(this);
+            default:
+                return false;
+        }
     }
 
-    public int getExp() {
-        return exp;
+    public boolean castSpell(Item spell, Monster target) {
+        if (!(spell.getType() == ItemType.SPELL)) {
+            return false;
+        }
+
+        // Check if hero has enough mana
+        if (stats.getMp() < ((Spell)spell).getManaCost()) {
+            return false;
+        }
+
+        // Check if target is in range
+        if (!canAttack(target.getCurrentPosition())) {
+            return false;
+        }
+
+        // Apply spell damage and effect
+        double damage = calculateSpellDamage((Spell)spell);
+        target.takeDamage(damage);
+
+        // Reduce hero's mana
+        stats.decreaseMP(((Spell)spell).getManaCost());
+
+        // Apply spell effect if target is still alive
+        if (target.getHp() > 0) {
+            ((Spell)spell).applyEffect(target);
+        }
+
+        return true;
     }
 
-    public HeroStats getStats() {
-        return stats;
+    private boolean canUseItem(Item item) {
+        // Check level requirement
+        if (level < item.getLevelRequirement()) {
+            return false;
+        }
+
+        // Check if item is in inventory
+        if (!inventory.contains(item)) {
+            return false;
+        }
+
+        return true;
     }
 
-    public int getGold() {
-        return gold;
+    private double calculateSpellDamage(Spell spell) {
+        // Base spell damage
+        double damage = spell.damage();
+
+        // Add dexterity bonus
+        damage *= (1 + stats.getDex() / 10000);
+
+        return damage;
     }
 
-    public Set<Item> getInventory() {
-        return inventory;
+
+    // Optional: Add method to check for nearby monsters
+    private boolean hasNearbyMonsters() {
+        if (currentPosition == null || assignedLane == null) {
+            return false;
+        }
+
+        // Check adjacent positions for monsters
+        for (Position pos : currentPosition.getAdjacentPositions()) {
+            if (assignedLane.hasMonsterAt(pos)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    public Collection<Item> getEquippedItems() {
-        return equippedItems.values();
+
+
+    public boolean teleport(Position targetPosition, Board<CellType> board) {
+        if (!canTeleportTo(targetPosition, board)) {
+            return false;
+        }
+
+        board.removeTerrainEffect(currentPosition, this);
+        currentPosition = targetPosition;
+        board.applyTerrainEffect(currentPosition, this);
+        return true;
     }
 
+    public void recall(Board<CellType> board) {
+        board.removeTerrainEffect(currentPosition, this);
+        currentPosition = nexusPosition;
+        board.applyTerrainEffect(currentPosition, this);
+    }
+
+    // Combat methods
+    public boolean canAttack(Position targetPosition) {
+        int dx = Math.abs(targetPosition.getX() - currentPosition.getX());
+        int dy = Math.abs(targetPosition.getY() - currentPosition.getY());
+        return (dx <= 1 && dy <= 1) && (dx + dy <= 1);
+    }
+
+    public double damageValue() {
+        double weaponDamage = equippedItems.values().stream()
+                .filter(item -> item.getType() == ItemType.WEAPON)
+                .mapToDouble(Item::damage)
+                .sum();
+        return (weaponDamage + stats.getStr()) * 0.05;
+    }
+
+    public void takeDamage(double damage) {
+        stats.decreaseHP(damage);
+        if (stats.getHp() <= 0) {
+            respawn();
+        }
+    }
+    // Add these methods to your Hero class
+
+    public boolean hasWeaponEquipped(EquipmentSlot slot) {
+        Item equippedItem = equippedItems.get(slot);
+        return equippedItem != null && equippedItem.getType() == ItemType.WEAPON;
+    }
+
+    public boolean canEquipWeapon(Weapon weapon) {
+        // Check if hero meets level requirement
+        if (getLevel() < weapon.getLevel()) {
+            return false;
+        }
+
+        // For two-handed weapons
+        if (weapon.getHands() == 2) {
+            return !hasWeaponEquipped(EquipmentSlot.LEFT_HAND) &&
+                    !hasWeaponEquipped(EquipmentSlot.RIGHT_HAND);
+        }
+
+        // For one-handed weapons
+        return !hasWeaponEquipped(EquipmentSlot.LEFT_HAND) ||
+                !hasWeaponEquipped(EquipmentSlot.RIGHT_HAND);
+    }
+
+    public void equipWeapon(Weapon weapon) {
+        if (weapon.getHands() == 2) {
+            equippedItems.put(EquipmentSlot.LEFT_HAND, weapon);
+            equippedItems.put(EquipmentSlot.RIGHT_HAND, weapon);
+        } else {
+            if (!hasWeaponEquipped(EquipmentSlot.LEFT_HAND)) {
+                equippedItems.put(EquipmentSlot.LEFT_HAND, weapon);
+            } else {
+                equippedItems.put(EquipmentSlot.RIGHT_HAND, weapon);
+            }
+        }
+    }
+
+
+    // Equipment methods
     public boolean equip(Weapon weapon) {
         if (weapon.getHands() == 2) {
-            this.equippedItems.put(EquipmentSlot.LEFT_HAND, weapon);
-            this.equippedItems.put(EquipmentSlot.RIGHT_HAND, weapon);
+            equippedItems.put(EquipmentSlot.LEFT_HAND, weapon);
+            equippedItems.put(EquipmentSlot.RIGHT_HAND, weapon);
         } else {
-            Item leftItem = this.equippedItems.get(EquipmentSlot.LEFT_HAND);
-            if (leftItem == null) {
-                this.equippedItems.put(EquipmentSlot.LEFT_HAND, weapon);
+            if (!equippedItems.containsKey(EquipmentSlot.LEFT_HAND)) {
+                equippedItems.put(EquipmentSlot.LEFT_HAND, weapon);
             } else {
-                Weapon w = ((Weapon) leftItem);
-                if (w.getHands() == 2) {
-                    this.equippedItems.remove(EquipmentSlot.LEFT_HAND);
-                    this.equippedItems.remove(EquipmentSlot.RIGHT_HAND);
-                    this.equippedItems.put(EquipmentSlot.LEFT_HAND, weapon);
-                } else {
-                    this.equippedItems.put(EquipmentSlot.RIGHT_HAND, weapon);
-                }
+                equippedItems.put(EquipmentSlot.RIGHT_HAND, weapon);
             }
         }
         return true;
     }
 
     public boolean equip(Armor armor) {
-        this.equippedItems.put(EquipmentSlot.BODY, armor);
+        equippedItems.put(EquipmentSlot.BODY, armor);
         return true;
     }
 
+    // Item management
     public boolean applyPotion(Potion potion) {
-        switch (potion.getPotionType()) {
-            case HP:
-                this.stats.increaseHP(potion.getAmount());
-                break;
-            case MP:
-                this.stats.increaseMP(potion.getAmount());
-                break;
-            case AGI:
-                this.stats.increaseAgi(potion.getAmount());
-                break;
-            case STR:
-                this.stats.increaseStr(potion.getAmount());
-                break;
-            case DEX:
-                this.stats.increaseDex(potion.getAmount());
-                break;
-
-            default:
-                break;
-        }
-        this.removeItem(potion);
+        potion.action(this);
+        inventory.remove(potion);
         return true;
-    }
-
-    public boolean doItemAction(Item item) {
-        return item.action(this);
     }
 
     public void addItem(Item item) {
-        this.inventory.add(item);
+        inventory.add(item);
+    }
+
+    public void removeItem(Item item) {
+        inventory.remove(item);
+        equippedItems.values().remove(item);
+    }
+
+    // Gold management
+    public void increaseGold(Double amount) {
+        this.gold += amount;
     }
 
     public void decreaseGold(Double amount) {
         this.gold -= amount;
     }
 
-    public void removeItem(Item item) {
-        this.inventory.remove(item);
-        Optional<Entry<EquipmentSlot, Item>> e = this.equippedItems.entrySet().stream()
-                .filter(ex -> ex.getValue() == item)
-                .findAny();
-        if (e.isPresent()) {
-            this.equippedItems.remove(e.get().getKey());
+    // Round end and respawn
+    public void respawn() {
+        stats.fullRestore();
+        currentPosition = nexusPosition;
+    }
+
+    public void restoreAfterRound() {
+        if (stats.getHp() > 0) {
+            stats.restorePercentHP(RESTORE_RATE);
+            stats.restorePercentMP(RESTORE_RATE);
         }
     }
 
-    public void increaseGold(Double amount) {
-        this.gold += amount;
+    private boolean isValidMove(Position newPos, Board<CellType> board) {
+        return board.isValid(newPos) &&
+                !board.isInaccessible(newPos) &&
+                !board.hasHero(newPos) &&
+                !hasMonsterAhead(newPos, board);
     }
 
-    public void increaseLevel() {
-        this.level++;
-        this.stats.increaseHP(100);
-        this.stats.increaseMP(this.stats.getMp() * 1.1);
+    private boolean hasMonsterAhead(Position pos, Board<CellType> board) {
+        return assignedLane.hasMonsterAhead(pos);
     }
 
-    public double damageValue() {
-        double left = this.equippedItems.containsKey(EquipmentSlot.LEFT_HAND)
-                ? this.equippedItems.get(EquipmentSlot.LEFT_HAND).damage()
-                : 0;
-        double right = this.equippedItems.containsKey(EquipmentSlot.RIGHT_HAND)
-                ? this.equippedItems.get(EquipmentSlot.RIGHT_HAND).damage()
-                : 0;
-        return (left + right + this.stats.getStr()) * 0.05;
-    }
-
-    public void takeDamage(double damage) {
-        this.stats.decreaseHP(damage);
-    }
-
-    public void restoreAfterTurn() {
-        this.stats.increaseHP(this.stats.getHp() * 11 / 10);
+    private boolean canTeleportTo(Position target, Board<CellType> board) {
+        return !currentPosition.isInSameLane(target) &&
+                !board.hasHero(target) &&
+                !assignedLane.hasMonsterAhead(target);
     }
 }

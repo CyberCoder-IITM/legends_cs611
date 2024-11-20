@@ -1,297 +1,469 @@
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.*;
 
 /*
  * The core component where the game is played
- */
+*/
 public class Legends {
+    private Board<CellType> board;
+    private List<Lane> lanes;
+    private HeroParty heroParty;
+    private MonsterParty monsterParty;
+    private Market market;
+    private IOHelper ioHelper;
+    private MarketStrategy marketStrategy;
+    private FightStrategy fightStrategy;
+    private MonsterFactory monsterFactory;
+    private int currentRound;
+    private Monsters.SpawnFrequency spawnFrequency;
 
-    Position heroPosition;
-
-    Board<CellType> board;
-    HeroParty heroParty;
-    Market market;
-    MarketStrategy marketStrategy;
-    FightStrategy fightStrategy;
-    MonsterFactory monsterSummoner;
-    IOHelper iohelper;
-
-    public Legends(Position heroPosition, Board<CellType> board, HeroParty heroParty, Market market,
-            MarketStrategy marketStrategy, FightStrategy fightStrategy, MonsterFactory monsterSummoner,
-            IOHelper iohelper) {
-        this.heroPosition = heroPosition;
+    public Legends(Board<CellType> board,
+                   List<Lane> lanes,
+                   HeroParty heroParty,
+                   Market market,
+                   MarketStrategy marketStrategy,
+                   FightStrategy fightStrategy,
+                   MonsterFactory monsterFactory,
+                   IOHelper ioHelper) {
         this.board = board;
+        this.lanes = lanes;
         this.heroParty = heroParty;
         this.market = market;
         this.marketStrategy = marketStrategy;
         this.fightStrategy = fightStrategy;
-        this.monsterSummoner = monsterSummoner;
-        this.iohelper = iohelper;
+        this.monsterFactory = monsterFactory;
+        this.ioHelper = ioHelper;
+        this.monsterParty = new MonsterParty();
+        this.currentRound = 0;
+        this.spawnFrequency = Monsters.SpawnFrequency.MEDIUM;
+
+        spawnNewMonsters();
     }
 
     public void play() {
-        printWorld();
-        showHeroInfo();
+        displayWelcomeMessage();
+
+        // Ensure initial monster wave exists
+        if (monsterParty.getAllMonsters().isEmpty()) {
+            spawnNewMonsters();
+        }
+
+
         while (true) {
-            Move move = readMoveAndValidate();
-            boolean heroesDied = false;
-            switch (move) {
-                case UP:
-                    heroesDied = moveAndFight(Direction.UP);
+            currentRound++;
+            ioHelper.println("\n=== Round " + currentRound + " ===");
 
-                    break;
-                case DOWN:
-                    heroesDied = moveAndFight(Direction.DOWN);
-                    break;
-                case LEFT:
-                    heroesDied = moveAndFight(Direction.LEFT);
-                    break;
-                case RIGHT:
-                    heroesDied = moveAndFight(Direction.RIGHT);
-                    break;
-                case INFO:
-                    showHeroInfo();
-                    break;
-                case MARKET:
-                    marketStrategy.act(heroParty, market);
-                    break;
-                case PRINT:
-                    printWorld();
-                    break;
-                case INVENTORY:
-                    doInventoryActions();
-                    break;
-                case HELP:
-                    showHelp();
-                    break;
-                case QUIT:
-                    return;
+            // Display current board state
+            displayBoard();
+
+            // Heroes' turn
+            if (!handleHeroesTurn()) {
+                handleVictory(true); // Heroes won
+                break;
             }
 
-            if (heroesDied) {
-                return;
+            // Monsters' turn
+            if (!handleMonstersTurn()) {
+                handleVictory(false); // Monsters won
+                break;
+            }
+
+            // End of round operations
+            handleEndOfRound();
+        }
+    }
+
+    private boolean handleHeroesTurn() {
+        for (Hero hero : heroParty.getHeroes()) {
+            displayHeroStatus(hero);
+
+            while (true) {
+                String action = ioHelper.nextLine(
+                        "Choose action:\n" +
+                                "1. Move (W/A/S/D)\n" +
+                                "2. Attack\n" +
+                                "3. Cast Spell\n" +
+                                "4. Teleport\n" +
+                                "5. Recall\n" +
+                                "6. Use Item\n" +
+                                "7. Market (only in Nexus)\n" +
+                                "Q. Quit\n" +
+                                "Choice: ",
+                        "Invalid choice",
+                        s -> "1234567Qq".contains(s)
+                );
+
+                if (action.equalsIgnoreCase("Q")) {
+                    return false;
+                }
+
+                if (executeHeroAction(hero, action)) {
+                    if (hero.getCurrentPosition().isMonsterNexus()) {
+                        return false; // Heroes win
+                    }
+                    break;
+                }
             }
         }
+        return true;
     }
-
-    private void showHelp() {
-        this.iohelper.println("------------ Moves and information -----------------");
-        this.iohelper.println("w    : move up");
-        this.iohelper.println("a    : move left");
-        this.iohelper.println("s    : move down");
-        this.iohelper.println("d    : move right");
-        this.iohelper.println("i    : show hero information");
-        this.iohelper.println("m    : open market");
-        this.iohelper.println("p    : show world");
-        this.iohelper.println("v    : move hero inventory");
-        this.iohelper.println("q    : quit");
-        this.iohelper.println("h    : help");
-    }
-
-    private void doInventoryActions() {
-        List<String> heroNames = this.heroParty.getHeroes().stream().map(Hero::getName).collect(Collectors.toList());
-        this.iohelper.println("Heroes: " + String.join(", ", heroNames));
-
-        String input = this.iohelper.nextLine("select a hero to show their inventory", "not a valid hero",
-                heroNames::contains);
-        Hero h = this.heroParty.getHeroes().stream().filter(x -> x.getName().equals(input)).findAny().get();
-
-        if (h.getInventory().size() == 0) {
-            this.iohelper.println("this hero does not have any items");
-            return;
-        }
-
-        this.iohelper.println("inventory for the hero: " + input);
-        for (Item i : h.getInventory()) {
-            boolean isEquipped = h.getEquippedItems().contains(i);
-            this.iohelper.println(
-                    "name:" + i.getName() + " type:" + i.getType().toString() + (!isEquipped ? "" : " (Equipped)"));
-        }
-
-        String itemName = this.iohelper.nextLine("item to use(q to quit):", "not a valid item name",
-                s -> s.equals("q")
-                        || h.getInventory().stream().map(Item::getName).collect(Collectors.toList())
-                                .contains(s));
-        if (itemName.equals("q")) {
-            return;
-        }
-
-        Item item = h.getInventory().stream().filter(i -> i.getName().equals(itemName)).findAny().get();
-        if (h.getEquippedItems().contains(item)) {
-            this.iohelper.printErr("item is already equipped");
-            doInventoryActions();
-            return;
-        }
-
-        h.doItemAction(item);
-    }
-
-    private void printWorld() {
-        this.iohelper.println("This is the World");
-        this.iohelper.println("H: heros");
-        this.iohelper.println("M: market");
-        this.iohelper.println("W: wall");
-        this.printBoard();
-    }
-
-    // print the board in the terminal
-    protected void printBoard() {
-        List<List<Cell2D<CellType>>> b = this.board.getBoard();
-        int n = b.size();
-        int m = b.get(0).size();
-
-        StringBuilder out = new StringBuilder();
-
-        out.append(line(m));
-        out.append("\n");
-
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                out.append(String.format("|%2s", printCell(b.get(i).get(j).getValue())));
-            }
-            out.append("|\n");
-            out.append(line(m));
-            out.append("\n");
-        }
-
-        this.iohelper.print(out.toString());
-    }
-
-    protected String printCell(CellType c) {
-        switch (c) {
-            case NONE:
-                return "";
-            case HEROES:
-                return "H";
-            case MARKET:
-                return "M";
-            case MARKET_WITH_HEROES:
-                return "HM";
-            case WALL:
-                return "W";
-            default:
-                return "N";
-        }
-    }
-
-    // printing the lines to separate each cell and outline the board
-    protected String line(int n) {
-        return String.join("", Collections.nCopies(n, "+--")) + "+";
-    }
-
-    private void showHeroInfo() {
-        for (Hero h : this.heroParty.getHeroes()) {
-            this.iohelper.println("------------- Hero and their information ----------------");
-            this.iohelper.println("Name         : " + h.getName());
-            this.iohelper.println("Type         : " + h.getType().toString());
-            this.iohelper.println("level        : " + h.getLevel());
-            this.iohelper.println("experience   : " + h.getExp());
-            this.iohelper.println("HP           : " + h.getStats().getHp());
-            this.iohelper.println("MP           : " + h.getStats().getMp());
-            this.iohelper.println("Strength     : " + h.getStats().getStr());
-            this.iohelper.println("Dexterity    : " + h.getStats().getDex());
-            this.iohelper.println("Agility      : " + h.getStats().getAgi());
-            this.iohelper.println("Gold         : " + h.getGold());
-        }
-    }
-
-    private boolean moveAndFight(Direction dir) {
-        Position newHeroPosition = heroPosition.move(dir);
-        if (this.board.at(newHeroPosition).getValue() == CellType.MARKET) {
-            this.board.set(newHeroPosition, CellType.MARKET_WITH_HEROES);
-            this.board.set(heroPosition, CellType.NONE);
-            this.heroPosition = newHeroPosition;
-            this.heroParty.restoreAfterTurn();
-            return false;
-        } else if (this.board.at(heroPosition).getValue() == CellType.MARKET_WITH_HEROES) {
-            this.board.set(newHeroPosition, CellType.HEROES);
-            this.board.set(heroPosition, CellType.MARKET);
-        } else {
-            this.board.set(heroPosition, CellType.NONE);
-            this.board.set(newHeroPosition, CellType.HEROES);
-        }
-        this.heroPosition = newHeroPosition;
-        MonsterParty monsterParty = this.monsterSummoner.summon(this.heroParty);
-        boolean heroesDied = this.fightStrategy.fight(this.heroParty, monsterParty);
-        if (heroesDied) {
+    private boolean handleMonstersTurn() {
+        // Check if monsterParty is null or needs initialization
+        if (monsterParty == null || monsterParty.getAllMonsters().isEmpty()) {
+            // Initialize first wave of monsters
+            spawnNewMonsters();
             return true;
         }
-        this.heroParty.restoreAfterTurn();
-        return false;
-    }
 
-    private Move readMoveAndValidate() {
-        Move move = readHeroMove();
-        if (isDirection(move)) {
-            Direction dir = moveToDirection(move);
-            Position newPostion = heroPosition.move(dir);
-            if (!board.isValid(newPostion)) {
-                iohelper.printErr("not a valid direction to move(going out of board)");
-                return readMoveAndValidate();
+        // Monster attacks
+        for (Monster monster : monsterParty.getAllMonsters()) {
+            if (monster == null) continue;  // Skip if monster is null
+
+            // Try to attack first
+            boolean attacked = false;
+            for (Hero hero : heroParty.getHeroes()) {
+                if (monster.canAttack(hero.getCurrentPosition())) {
+                    hero.takeDamage(monster.getDamage());
+                    attacked = true;
+                    break;
+                }
             }
 
-            if (board.at(newPostion).getValue().equals(CellType.WALL)) {
-                iohelper.printErr("not a valid direction to move(encountered a wall)");
-                return readMoveAndValidate();
+            // If didn't attack, move forward
+            if (!attacked) {
+                if (monster.moveForward(board)) {
+                    return false; // Monsters reached hero nexus
+                }
+            }
+        }
+        return true;
+    }
+
+
+
+    private void handleEndOfRound() {
+        // Restore heroes
+        for (Hero hero : heroParty.getHeroes()) {
+            if (hero.getStats().getHp() > 0) {
+                hero.getStats().restorePercentHP(0.1);
+                hero.getStats().restorePercentMP(0.1);
             }
         }
 
-        if (move == Move.MARKET && !board.at(heroPosition).getValue().equals(CellType.MARKET_WITH_HEROES)) {
-            iohelper.printErr("heroes are not on a market space");
-            return readMoveAndValidate();
+        // Respawn dead heroes
+        for (Hero hero : heroParty.getHeroes()) {
+            if (hero.getStats().getHp() <= 0) {
+                hero.respawn();
+            }
         }
-        return move;
-    }
 
-    private boolean isDirection(Move move) {
-        return move == Move.UP || move == Move.DOWN || move == Move.RIGHT || move == Move.LEFT;
-    }
-
-    private Direction moveToDirection(Move move) {
-        switch (move) {
-            case UP:
-                return Direction.UP;
-            case DOWN:
-                return Direction.DOWN;
-            case LEFT:
-                return Direction.LEFT;
-            case RIGHT:
-                return Direction.RIGHT;
-            default:
-                return Direction.UP;
+        // Check for monster spawning
+        if (Monsters.shouldSpawn(currentRound, spawnFrequency)) {
+            spawnNewMonsters();
         }
     }
 
-    private Move readHeroMove() {
-        String input = this.iohelper.nextLine("Move(w/a/s/d/q/i/m/p/v/h): ", "is not a valid input",
-                s -> s.toLowerCase().matches("[wasdqimpvh]"));
+    private void spawnNewMonsters() {
+        int maxHeroLevel = heroParty.getHeroes().stream()
+                .mapToInt(Hero::getLevel)
+                .max()
+                .orElse(1);
 
-        switch (input.toLowerCase()) {
-            case "w":
-                return Move.UP;
-            case "a":
-                return Move.LEFT;
-            case "s":
-                return Move.DOWN;
-            case "d":
-                return Move.RIGHT;
-            case "i":
-                return Move.INFO;
-            case "m":
-                return Move.MARKET;
-            case "p":
-                return Move.PRINT;
-            case "v":
-                return Move.INVENTORY;
-            case "q":
-                return Move.QUIT;
-            case "h":
-                return Move.HELP;
-            default:
-                break;
-        }
-        return Move.NONE;
+        monsterParty.spawnNewWave(lanes, maxHeroLevel);
     }
 
+    private boolean executeHeroAction(Hero hero, String action) {
+        switch (action) {
+            case "1": return handleHeroMove(hero);
+            case "2": return handleHeroAttack(hero);
+            case "3": return handleHeroSpell(hero);
+            case "4": return handleHeroTeleport(hero);
+            case "5": return handleHeroRecall(hero);
+            case "6": return handleHeroItem(hero);
+            case "7": return handleMarket(hero);
+            default: return false;
+        }
+    }
+
+    private void displayBoard() {
+        ioHelper.println("\nCurrent Board State:");
+        ioHelper.println("N: Nexus  I: Inaccessible  B: Bush  C: Cave  K: Koulou  P: Plain");
+        ioHelper.println("H: Hero   M: Monster       X: Combat\n");
+
+        // Display board implementation
+        board.display();
+    }
+
+    private void handleVictory(boolean heroesWon) {
+        if (heroesWon) {
+            ioHelper.println("\nVICTORY! The heroes have reached the monster's nexus!");
+        } else {
+            ioHelper.println("\nDEFEAT! The monsters have reached your nexus!");
+        }
+        displayFinalStats();
+    }
+
+    // Additional helper methods....
+
+    private void displayHeroStatus(Hero hero) {
+        ioHelper.println("\n=== " + hero.getName() + "'s Status ===");
+        ioHelper.println("HP: " + hero.getStats().getHp() + "/" + hero.getStats().getMaxHp());
+        ioHelper.println("MP: " + hero.getStats().getMp() + "/" + hero.getStats().getMaxMp());
+        ioHelper.println("Position: " + hero.getCurrentPosition());
+        ioHelper.println("Current Space: " + board.at(hero.getCurrentPosition()).getValue());
+    }
+
+    private boolean handleHeroMove(Hero hero) {
+        String direction = ioHelper.nextLine(
+                "Enter direction (W/A/S/D): ",
+                "Invalid direction",
+                s -> "WASDwasd".contains(s)
+        ).toUpperCase();
+
+        Direction moveDir;
+        switch(direction) {
+            case "W": moveDir = Direction.UP; break;
+            case "S": moveDir = Direction.DOWN; break;
+            case "A": moveDir = Direction.LEFT; break;
+            case "D": moveDir = Direction.RIGHT; break;
+            default: return false;
+        }
+
+        return hero.move(moveDir, board);
+    }
+
+
+private boolean handleHeroAttack(Hero hero) {
+    // Get attackable monsters
+    List<Monster> attackableMonsters = getAttackableMonsters(hero);
+
+    // Check if there are any monsters to attack
+    if (attackableMonsters.isEmpty()) {
+        ioHelper.println("No monsters in range to attack!");
+        return false    ;
+    }
+
+    // Display attackable monsters
+    displayAttackableMonsters(attackableMonsters);
+
+    // Get player's choice
+    int choice = ioHelper.nextLineInt(
+            "Choose monster to attack (1-" + attackableMonsters.size() + "): ",
+            "Invalid choice",
+            i -> i >= 1 && i <= attackableMonsters.size()
+    );
+
+    // Attack chosen monster
+    Monster target = attackableMonsters.get(choice - 1);
+    performHeroAttack(hero, target);
+    return true;
+}
+
+    private List<Monster> getAttackableMonsters(Hero hero) {
+        List<Monster> attackable = new ArrayList<>();
+        Lane heroLane = hero.getAssignedLane();
+
+        if (heroLane != null) {
+            for (Monster monster : heroLane.getMonsters()) {
+                if (hero.canAttack(monster.getCurrentPosition())) {
+                    attackable.add(monster);
+                }
+            }
+        }
+        return attackable;
+    }
+
+    private void displayAttackableMonsters(List<Monster> monsters) {
+        ioHelper.println("\nMonsters in range:");
+        for (int i = 0; i < monsters.size(); i++) {
+            Monster m = monsters.get(i);
+            ioHelper.println((i+1) + ". " + m.getName() +
+                    " (HP: " + m.getHp() +
+                    ", Lane: " + (m.getAssignedLane().getLaneNumber() + 1) + ")");
+        }
+    }
+
+    private void performHeroAttack(Hero hero, Monster target) {
+        if (target.dodged()) {
+            ioHelper.println(target.getName() + " dodged the attack!");
+            return;
+        }
+
+        double damage = hero.damageValue();
+        target.takeDamage(damage);
+        ioHelper.println(hero.getName() + " dealt " + damage + " damage to " + target.getName());
+
+        if (target.getHp() <= 0) {
+            handleMonsterDeath(target);
+        }
+    }
+
+    private void handleMonsterDeath(Monster target) {
+        ioHelper.println(target.getName() + " has been defeated!");
+        monsterParty.removeMonster(target);
+        distributeRewards(target);
+    }
+
+    private void distributeRewards(Monster monster) {
+        int goldReward = 500 * monster.getLevel();
+        int expReward = 2 * monster.getLevel();
+
+        for (Hero hero : heroParty.getHeroes()) {
+            hero.increaseGold((double)goldReward);
+            // Add experience points handling if implemented
+            ioHelper.println(hero.getName() + " received " + goldReward + " gold!");
+        }
+    }
+
+
+    private boolean handleHeroSpell(Hero hero) {
+        List<Item> spells = hero.getInventory().stream()
+                .filter(i -> i.getType() == ItemType.SPELL)
+                .collect(Collectors.toList());
+
+        if (spells.isEmpty()) {
+            ioHelper.println("No spells available!");
+            return false;
+        }
+
+        displaySpells(spells);
+        String spellName = ioHelper.nextLine(
+                "Choose spell to cast (or 'q' to cancel): ",
+                "Invalid spell",
+                s -> s.equals("q") || spells.stream().anyMatch(spell -> spell.getName().equals(s))
+        );
+
+        if (spellName.equals("q")) return false;
+
+        List<Monster> inRangeMonsters = monsterParty.getAllMonsters().stream()
+                .filter(m -> hero.canAttack(m.getCurrentPosition()))
+                .collect(Collectors.toList());
+
+        if (inRangeMonsters.isEmpty()) {
+            ioHelper.println("No monsters in range!");
+            return false;
+        }
+
+        displayAttackableMonsters(inRangeMonsters);
+        int choice = ioHelper.nextLineInt(
+                "Choose target (1-" + inRangeMonsters.size() + "): ",
+                "Invalid choice",
+                i -> i >= 1 && i <= inRangeMonsters.size()
+        );
+
+        Monster target = inRangeMonsters.get(choice - 1);
+        Item spell = spells.stream()
+                .filter(s -> s.getName().equals(spellName))
+                .findFirst().get();
+
+        return hero.castSpell(spell, target);
+    }
+
+    private boolean handleHeroTeleport(Hero hero) {
+        List<Hero> otherHeroes = heroParty.getHeroes().stream()
+                .filter(h -> h != hero && !h.getCurrentPosition().isInSameLane(hero.getCurrentPosition()))
+                .collect(Collectors.toList());
+
+        if (otherHeroes.isEmpty()) {
+            ioHelper.println("No valid heroes to teleport to!");
+            return false;
+        }
+
+        displayTeleportTargets(otherHeroes);
+        int choice = ioHelper.nextLineInt(
+                "Choose hero to teleport to (1-" + otherHeroes.size() + "): ",
+                "Invalid choice",
+                i -> i >= 1 && i <= otherHeroes.size()
+        );
+
+        Hero target = otherHeroes.get(choice - 1);
+        return hero.teleport(target.getCurrentPosition(), board);
+    }
+
+    private boolean handleHeroRecall(Hero hero) {
+        hero.recall(board);
+        ioHelper.println(hero.getName() + " recalled to Nexus");
+        return true;
+    }
+
+    private boolean handleHeroItem(Hero hero) {
+        if (hero.getInventory().isEmpty()) {
+            ioHelper.println("No items in inventory!");
+            return false;
+        }
+
+        displayInventory(hero);
+        String itemName = ioHelper.nextLine(
+                "Choose item to use (or 'q' to cancel): ",
+                "Invalid item",
+                s -> s.equals("q") || hero.getInventory().stream()
+                        .anyMatch(item -> item.getName().equals(s))
+        );
+
+        if (itemName.equals("q")) return false;
+
+        Item item = hero.getInventory().stream()
+                .filter(i -> i.getName().equals(itemName))
+                .findFirst().get();
+
+        return hero.doItemAction(item);
+    }
+
+    private boolean handleMarket(Hero hero) {
+        if (!hero.getCurrentPosition().isHeroNexus()) {
+            ioHelper.println("Must be in Nexus to access market!");
+            return false;
+        }
+
+        market.handleTransaction(hero, ioHelper);
+        return true;
+    }
+
+    private void displaySpells(List<Item> spells) {
+        ioHelper.println("\nAvailable Spells:");
+        for (Item spell : spells) {
+            ioHelper.println(spell.getName());
+        }
+    }
+
+    private void displayTeleportTargets(List<Hero> heroes) {
+        ioHelper.println("\nPossible teleport targets:");
+        for (int i = 0; i < heroes.size(); i++) {
+            Hero h = heroes.get(i);
+            ioHelper.println((i+1) + ". " + h.getName() + " at " + h.getCurrentPosition());
+        }
+    }
+
+    private void displayInventory(Hero hero) {
+        ioHelper.println("\nInventory:");
+        for (Item item : hero.getInventory()) {
+            ioHelper.println(item.getName() + " (" + item.getType() + ")");
+        }
+    }
+
+    private void displayFinalStats() {
+        ioHelper.println("\nFinal Statistics:");
+        ioHelper.println("Total Rounds: " + currentRound);
+
+        for (Hero hero : heroParty.getHeroes()) {
+            ioHelper.println("\n" + hero.getName() + ":");
+            ioHelper.println("Level: " + hero.getLevel());
+            ioHelper.println("Experience: " + hero.getExp());
+            ioHelper.println("Gold: " + hero.getGold());
+        }
+    }
+
+    private void displayWelcomeMessage() {
+        ioHelper.println("Welcome to Legends of Valor!");
+        ioHelper.println("-----------------------------");
+        ioHelper.println("Reach the monster's nexus to win!");
+        ioHelper.println("Don't let monsters reach your nexus!");
+        ioHelper.println("\nControls:");
+        ioHelper.println("W/A/S/D - Move");
+        ioHelper.println("T - Teleport");
+        ioHelper.println("R - Recall");
+        ioHelper.println("I - Use Item");
+        ioHelper.println("M - Market (at Nexus only)");
+    }
 }
