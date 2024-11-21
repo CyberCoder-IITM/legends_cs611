@@ -129,9 +129,6 @@ public class Board<T> {
         return p.getX() == 0;
     }
 
-//    public void placeHero(Position p, Hero hero) {
-//        heroPositions.put(p, hero);
-//    }
 
     public void placeHero(Position p, Hero hero) {
         if (!isValid(p)) {
@@ -151,10 +148,6 @@ public class Board<T> {
     public void removeMonster(Position p) {
         monsterPositions.remove(p);
     }
-
-//    public boolean hasHero(Position p) {
-//        return heroPositions.containsKey(p);
-//    }
 
     public boolean hasMonster(Position p) {
         return monsterPositions.containsKey(p);

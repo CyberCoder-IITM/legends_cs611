@@ -2,27 +2,71 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d6339476-3661-4ebe-b67d-be87dce33984" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/Board.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Hero.java" beforeDir="false" afterPath="$PROJECT_DIR$/Hero.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Legends.java" beforeDir="false" afterPath="$PROJECT_DIR$/Legends.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Monster.java" beforeDir="false" afterPath="$PROJECT_DIR$/Monster.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MonsterFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/MonsterFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Potion.java" beforeDir="false" afterPath="$PROJECT_DIR$/Potion.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PotionType.java" beforeDir="false" afterPath="$PROJECT_DIR$/PotionType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RandomMonsterFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/RandomMonsterFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WorldGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/WorldGenerator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/AllFightStrategy$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/legends/AllFightStrategy$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/legends/AllFightStrategy.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/legends/AllFightStrategy.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/App.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Armor.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Board$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/legends/Board$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/legends/Board.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/legends/Board.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Cell2D.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/CellType$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/CellType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Direction.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/EquipmentSlot.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/FightStrategy.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/GameDifficulty.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/GameRunner.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/legends/Hero$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/legends/Hero$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/legends/Hero.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/legends/Hero.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/HeroParty.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/HeroStats$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/HeroStats.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/HeroType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Heroes.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/IOHelper$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/IOHelper.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Item$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Item.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/ItemType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Items.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Lane.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/legends/Legends.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/legends/Legends.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Market.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/MarketStrategy.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Monster$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/legends/Monster$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/legends/Monster.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/legends/Monster.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/legends/MonsterFactory.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/legends/MonsterFactory.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/MonsterParty.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/MonsterType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Monsters$SpawnFrequency.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Monsters.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Move$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Move.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Position$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Position.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Potion$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/legends/Potion$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/legends/Potion.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/legends/Potion.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/legends/PotionType.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/legends/PotionType.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/RandomMonsterFactory$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/legends/RandomMonsterFactory$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/legends/RandomMonsterFactory.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/legends/RandomMonsterFactory.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Spell.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/SpellEffect$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/SpellEffect$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/SpellEffect$3.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/SpellEffect.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/TerrainEffect$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/TerrainEffect.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/Weapon.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/legends/WorldGenerator.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/legends/WorldGenerator.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/legends.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/legends_uml.png" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -51,28 +51,6 @@ public class Legends {
 //            currentRound++;
             ioHelper.println("\n=== Round " + currentRound + " ===");
             displayBoard();
-            // Display current board state with proper legend
-//            ioHelper.println("\nCurrent Board State:");
-//            ioHelper.println("N: Nexus  I: Inaccessible  B: Bush  C: Cave  K: Koulou  P: Plain");
-//            ioHelper.println("H1/H2/H3: Heroes  M1/M2/M3: Monsters  X: Combat\n");
-//            displayBoard();
-
-            // Heroes' turn - each hero must make one valid move
-//            for (Hero hero : heroParty.getHeroes()) {
-//                if (hero.getCurrentPosition().isMonsterNexus()) {
-//                    handleVictory(true); // Heroes win immediately upon reaching monster nexus
-//                    return;
-//                }
-//
-//                // Handle hero's turn
-//                while (true) {
-//                    String action = getHeroAction(hero);
-//                    if (executeHeroAction(hero, action)) {
-//                        break;
-//                    }
-//                }
-//
-//            }
             ioHelper.println("\n=== Heroes' Turn ===");
             for (Hero hero : heroParty.getHeroes()) {
                 displayHeroStatus(hero);
@@ -98,14 +76,6 @@ public class Legends {
                 }
             }
 
-//            // Monsters' turn - each monster either attacks or moves forward
-//            for (Monster monster : monsterParty.getAllMonsters()) {
-//                if (monster.getCurrentPosition().isHeroNexus()) {
-//                    handleVictory(false); // Monsters win immediately upon reaching hero nexus
-//                    return;
-//
-//                }
-//            }
 
             // Monster either attacks if hero in range or moves south
             ioHelper.println("\n=== Monsters' Turn ===");
@@ -185,34 +155,6 @@ public class Legends {
         }
         return true;
     }
-//
-//private boolean handleMonstersTurn() {
-//    for (Monster monster : monsterParty.getAllMonsters()) {
-//        // First check if can attack any hero
-//        boolean attacked = false;
-//        for (Hero hero : heroParty.getHeroes()) {
-//            if (monster.canAttack(hero.getCurrentPosition())) {
-//                hero.takeDamage(monster.getDamage());
-//                attacked = true;
-//                break;
-//            }
-//        }
-//
-//        // If couldn't attack, move one space forward
-//        if (!attacked) {
-//            Position newPos = new Position(
-//                    monster.getCurrentPosition().getX() + 1,
-//                    monster.getCurrentPosition().getY()
-//            );
-//            if (board.isValid(newPos) && !board.isInaccessible(newPos)) {
-//                board.removeMonster(monster.getCurrentPosition());
-//                monster.setCurrentPosition(newPos);
-//                board.placeMonster(newPos, monster);
-//            }
-//        }
-//    }
-//    return true;
-//}
 
     private boolean handleMonstersTurn() {
         for (Monster monster : monsterParty.getAllMonsters()) {
@@ -371,31 +313,6 @@ private void spawnNewMonsters() {
     }
 
 
-//private boolean handleHeroAttack(Hero hero) {
-//    // Get attackable monsters
-//    List<Monster> attackableMonsters = getAttackableMonsters(hero);
-//
-//    // Check if there are any monsters to attack
-//    if (attackableMonsters.isEmpty()) {
-//        ioHelper.println("No monsters in range to attack!");
-//        return false    ;
-//    }
-//
-//    // Display attackable monsters
-//    displayAttackableMonsters(attackableMonsters);
-//
-//    // Get player's choice
-//    int choice = ioHelper.nextLineInt(
-//            "Choose monster to attack (1-" + attackableMonsters.size() + "): ",
-//            "Invalid choice",
-//            i -> i >= 1 && i <= attackableMonsters.size()
-//    );
-//
-//    // Attack chosen monster
-//    Monster target = attackableMonsters.get(choice - 1);
-//    performHeroAttack(hero, target);
-//    return true;
-//}
 private boolean handleHeroAttack(Hero hero) {
     // Get attackable monsters
     List<Monster> attackableMonsters = new ArrayList<>();
