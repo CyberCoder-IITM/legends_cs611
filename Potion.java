@@ -14,9 +14,6 @@ public class Potion extends Item {
         this.potionType = potionType;
         this.consumed = false;
     }
-
-
-
     // Getters
     public int getLevel() { return level; }
     public double getAmount() { return amount; }

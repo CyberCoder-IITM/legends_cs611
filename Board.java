@@ -129,7 +129,14 @@ public class Board<T> {
         return p.getX() == 0;
     }
 
+//    public void placeHero(Position p, Hero hero) {
+//        heroPositions.put(p, hero);
+//    }
+
     public void placeHero(Position p, Hero hero) {
+        if (!isValid(p)) {
+            throw new IllegalArgumentException("Invalid position");
+        }
         heroPositions.put(p, hero);
     }
 
@@ -145,9 +152,9 @@ public class Board<T> {
         monsterPositions.remove(p);
     }
 
-    public boolean hasHero(Position p) {
-        return heroPositions.containsKey(p);
-    }
+//    public boolean hasHero(Position p) {
+//        return heroPositions.containsKey(p);
+//    }
 
     public boolean hasMonster(Position p) {
         return monsterPositions.containsKey(p);
@@ -160,6 +167,20 @@ public class Board<T> {
         }
     }
 
+    public boolean hasTerrainEffect(Position pos) {
+        CellType cellType = (CellType)at(pos).getValue();
+        return cellType == CellType.BUSH ||
+                cellType == CellType.CAVE ||
+                cellType == CellType.KOULOU;
+    }
+
+    public TerrainEffect getTerrainEffect(Position pos) {
+        if (!hasTerrainEffect(pos)) {
+            return null;
+        }
+        return terrainEffects.get(pos);
+    }
+
     public void removeTerrainEffect(Position pos, Hero hero) {
         TerrainEffect effect = terrainEffects.get(pos);
         if (effect != null) {
@@ -167,33 +188,49 @@ public class Board<T> {
         }
     }
 
+    // In Board.java
     public void display() {
         System.out.println("\nCurrent Board State:");
-        System.out.println("N: Nexus  I: Inaccessible  B: Bush  C: Cave  K: Koulou  P: Plain");
-        System.out.println("H1/H2/H3: Heroes   M1/M2/M3: Monsters   X: Combat");
-        System.out.println("   0 1 2 3 4 5 6 7");
-        System.out.println("  ----------------");
+        System.out.println("\nI: Inaccessible  N: Nexus  P: Plain  B: Bush  C: Cave  K: Koulou");
+        System.out.println("H1/H2/H3: Heroes  M1/M2/M3: Monsters  X: Combat\n");
+
+        // Print column numbers with proper spacing
+        System.out.print("    ");
+        for (int j = 0; j < cols; j++) {
+            System.out.print(j + "   ");
+        }
+        System.out.println();
+
+
+        // Print board content
         for (int i = 0; i < rows; i++) {
-            System.out.print(i + " |");
+            System.out.print(i + " ||");
             for (int j = 0; j < cols; j++) {
-                Position pos = new Position(i, j);
-                if (hasHero(pos) && hasMonster(pos)) {
-                    System.out.print("X ");
-                } else if (hasHero(pos)) {
-                    Hero hero = heroPositions.get(pos);
-                    System.out.print("H" + hero.getName().charAt(0) + " ");
-                } else if (hasMonster(pos)) {
-                    Monster monster = monsterPositions.get(pos);
-                    System.out.print("M" + monster.getName().charAt(0) + " ");
+                Position currentPos = new Position(i, j);
+
+                if (hasHero(currentPos) && hasMonster(currentPos)) {
+                    System.out.print(" X  |");
+                } else if (hasHero(currentPos)) {
+                    Hero hero = heroPositions.get(currentPos);
+                    System.out.print(" H" + (hero.getAssignedLane().getLaneNumber() + 1) + " |");
+                } else if (hasMonster(currentPos)) {
+                    Monster monster = monsterPositions.get(currentPos);
+                    System.out.print(" M" + (monster.getAssignedLane().getLaneNumber() + 1) + " |");
                 } else {
-                    CellType cellType = (CellType)at(pos).getValue();
-                    System.out.print(getCellSymbol(cellType) + " ");
+                    CellType cellType = (CellType)at(currentPos).getValue();
+                    System.out.print(" " + getCellSymbol(cellType) + "  |");
                 }
             }
             System.out.println("|");
         }
-        System.out.println("  ----------------");
     }
+
+
+    public boolean hasHero(Position p) {
+        boolean has = heroPositions.containsKey(p);
+        return has;
+    }
+
 
     private String getCellSymbol(CellType cellType) {
         switch(cellType) {

@@ -43,36 +43,113 @@ public class Legends {
 
     public void play() {
         displayWelcomeMessage();
-
-        // Ensure initial monster wave exists
         if (monsterParty.getAllMonsters().isEmpty()) {
             spawnNewMonsters();
         }
 
-
         while (true) {
-            currentRound++;
+//            currentRound++;
             ioHelper.println("\n=== Round " + currentRound + " ===");
-
-            // Display current board state
             displayBoard();
+            // Display current board state with proper legend
+//            ioHelper.println("\nCurrent Board State:");
+//            ioHelper.println("N: Nexus  I: Inaccessible  B: Bush  C: Cave  K: Koulou  P: Plain");
+//            ioHelper.println("H1/H2/H3: Heroes  M1/M2/M3: Monsters  X: Combat\n");
+//            displayBoard();
 
-            // Heroes' turn
-            if (!handleHeroesTurn()) {
-                handleVictory(true); // Heroes won
-                break;
+            // Heroes' turn - each hero must make one valid move
+//            for (Hero hero : heroParty.getHeroes()) {
+//                if (hero.getCurrentPosition().isMonsterNexus()) {
+//                    handleVictory(true); // Heroes win immediately upon reaching monster nexus
+//                    return;
+//                }
+//
+//                // Handle hero's turn
+//                while (true) {
+//                    String action = getHeroAction(hero);
+//                    if (executeHeroAction(hero, action)) {
+//                        break;
+//                    }
+//                }
+//
+//            }
+            ioHelper.println("\n=== Heroes' Turn ===");
+            for (Hero hero : heroParty.getHeroes()) {
+                displayHeroStatus(hero);
+                // Check victory before hero's action
+
+                if (hero.getCurrentPosition().isMonsterNexus()) {
+                    handleVictory(true);
+                    return;
+                }
+                // Hero's action
+
+                while (true) {
+                    String action = getHeroAction(hero);
+                    if (executeHeroAction(hero, action)) {
+                        break;
+                    }
+                }
+
+                // Check victory after hero's action
+                if (hero.getCurrentPosition().isMonsterNexus()) {
+                    handleVictory(true);
+                    return;
+                }
             }
 
-            // Monsters' turn
+//            // Monsters' turn - each monster either attacks or moves forward
+//            for (Monster monster : monsterParty.getAllMonsters()) {
+//                if (monster.getCurrentPosition().isHeroNexus()) {
+//                    handleVictory(false); // Monsters win immediately upon reaching hero nexus
+//                    return;
+//
+//                }
+//            }
+
+            // Monster either attacks if hero in range or moves south
+            ioHelper.println("\n=== Monsters' Turn ===");
             if (!handleMonstersTurn()) {
-                handleVictory(false); // Monsters won
-                break;
+                // Check monster victory condition
+
+                for (Monster monster : monsterParty.getAllMonsters()) {
+                    if (monster.getCurrentPosition().isHeroNexus()) {
+                        handleVictory(false);
+                        return;
+                    }
+                }
+                continue;
             }
+
 
             // End of round operations
             handleEndOfRound();
+
+            // Spawn new monsters every 8 rounds (as per PDF)
+            if (currentRound % 8 == 0) {
+                spawnNewMonsters();
+            }
+            currentRound++;
         }
     }
+
+    private String getHeroAction(Hero hero) {
+        return ioHelper.nextLine(
+                "Choose action:\n" +
+                        "1. Move (W/A/S/D)\n" +
+                        "2. Attack\n" +
+                        "3. Cast Spell\n" +
+                        "4. Teleport\n" +
+                        "5. Recall\n" +
+                        "6. Use Item\n" +
+                        "7. Market (only in Nexus)\n" +
+                        "Q. Quit\n" +
+                        "Choice: ",
+                "Invalid choice",
+                s -> "1234567Qq".contains(s)
+        );
+    }
+
 
     private boolean handleHeroesTurn() {
         for (Hero hero : heroParty.getHeroes()) {
@@ -108,32 +185,55 @@ public class Legends {
         }
         return true;
     }
+//
+//private boolean handleMonstersTurn() {
+//    for (Monster monster : monsterParty.getAllMonsters()) {
+//        // First check if can attack any hero
+//        boolean attacked = false;
+//        for (Hero hero : heroParty.getHeroes()) {
+//            if (monster.canAttack(hero.getCurrentPosition())) {
+//                hero.takeDamage(monster.getDamage());
+//                attacked = true;
+//                break;
+//            }
+//        }
+//
+//        // If couldn't attack, move one space forward
+//        if (!attacked) {
+//            Position newPos = new Position(
+//                    monster.getCurrentPosition().getX() + 1,
+//                    monster.getCurrentPosition().getY()
+//            );
+//            if (board.isValid(newPos) && !board.isInaccessible(newPos)) {
+//                board.removeMonster(monster.getCurrentPosition());
+//                monster.setCurrentPosition(newPos);
+//                board.placeMonster(newPos, monster);
+//            }
+//        }
+//    }
+//    return true;
+//}
+
     private boolean handleMonstersTurn() {
-        // Check if monsterParty is null or needs initialization
-        if (monsterParty == null || monsterParty.getAllMonsters().isEmpty()) {
-            // Initialize first wave of monsters
-            spawnNewMonsters();
-            return true;
-        }
-
-        // Monster attacks
         for (Monster monster : monsterParty.getAllMonsters()) {
-            if (monster == null) continue;  // Skip if monster is null
-
-            // Try to attack first
             boolean attacked = false;
             for (Hero hero : heroParty.getHeroes()) {
                 if (monster.canAttack(hero.getCurrentPosition())) {
-                    hero.takeDamage(monster.getDamage());
+                    double damage = monster.getDamage();
+                    hero.takeDamage(damage);
+                    ioHelper.println(monster.getName() + " attacks " + hero.getName() + " for " + damage + " damage!");
                     attacked = true;
                     break;
                 }
             }
 
-            // If didn't attack, move forward
             if (!attacked) {
-                if (monster.moveForward(board)) {
-                    return false; // Monsters reached hero nexus
+                Position newPos = new Position(monster.getCurrentPosition().getX() + 1, monster.getCurrentPosition().getY());
+                if (board.isValid(newPos) && !board.isInaccessible(newPos) && !board.hasMonster(newPos)) {
+                    board.removeMonster(monster.getCurrentPosition());
+                    monster.setCurrentPosition(newPos);
+                    board.placeMonster(newPos, monster);
+                    ioHelper.println(monster.getName() + " moves forward!");
                 }
             }
         }
@@ -155,27 +255,54 @@ public class Legends {
         for (Hero hero : heroParty.getHeroes()) {
             if (hero.getStats().getHp() <= 0) {
                 hero.respawn();
+                ioHelper.println(hero.getName() + " has respawned at their Nexus!");
             }
         }
 
-        // Check for monster spawning
-        if (Monsters.shouldSpawn(currentRound, spawnFrequency)) {
-            spawnNewMonsters();
-        }
+        monsterParty.removeDeadMonsters();
+
     }
 
-    private void spawnNewMonsters() {
-        int maxHeroLevel = heroParty.getHeroes().stream()
-                .mapToInt(Hero::getLevel)
-                .max()
-                .orElse(1);
 
-        monsterParty.spawnNewWave(lanes, maxHeroLevel);
+private void spawnNewMonsters() {
+    int maxHeroLevel = heroParty.getHighestLevel();
+
+    // Spawn one monster per lane
+    for (Lane lane : lanes) {
+        Position spawnPos = new Position(0, lane.getMonsterNexus().getY());
+        Monster monster = monsterFactory.createMonster(maxHeroLevel, spawnPos, lane);
+        monsterParty.addMonster(monster);
+        board.placeMonster(spawnPos, monster);
     }
+}
 
     private boolean executeHeroAction(Hero hero, String action) {
         switch (action) {
-            case "1": return handleHeroMove(hero);
+//            case "1": return handleHeroMove(hero);
+            case "1":
+                String direction = ioHelper.nextLine(
+                        "[+] Enter direction (W/A/S/D): ",
+                        "Invalid direction",
+                        s -> "WASDwasd".contains(s)
+                ).toUpperCase();
+
+                Direction moveDir;
+                switch(direction) {
+                    case "W": moveDir = Direction.UP; break;
+                    case "S": moveDir = Direction.DOWN; break;
+                    case "A": moveDir = Direction.LEFT; break;
+                    case "D": moveDir = Direction.RIGHT; break;
+                    default: return false;
+                }
+
+                boolean moved = hero.move(moveDir, board);
+                if (moved) {
+                    ioHelper.println(hero.getName() + " moved " + direction);
+                    displayBoard();  // Add only this line to show updated board
+                    return true;
+                }
+                ioHelper.println("Invalid move!");
+                return false;
             case "2": return handleHeroAttack(hero);
             case "3": return handleHeroSpell(hero);
             case "4": return handleHeroTeleport(hero);
@@ -187,10 +314,6 @@ public class Legends {
     }
 
     private void displayBoard() {
-        ioHelper.println("\nCurrent Board State:");
-        ioHelper.println("N: Nexus  I: Inaccessible  B: Bush  C: Cave  K: Koulou  P: Plain");
-        ioHelper.println("H: Hero   M: Monster       X: Combat\n");
-
         // Display board implementation
         board.display();
     }
@@ -214,6 +337,20 @@ public class Legends {
         ioHelper.println("Current Space: " + board.at(hero.getCurrentPosition()).getValue());
     }
 
+    private boolean handleHeroTurn(Hero hero) {
+        displayHeroStatus(hero);
+
+        while (true) {
+            String action = getHeroAction(hero);
+            if (executeHeroAction(hero, action)) {
+                // After successful action, show updated board
+                ioHelper.println("\nAfter " + hero.getName() + "'s action:");
+                displayBoard();
+                return true;
+            }
+        }
+    }
+
     private boolean handleHeroMove(Hero hero) {
         String direction = ioHelper.nextLine(
                 "Enter direction (W/A/S/D): ",
@@ -234,18 +371,60 @@ public class Legends {
     }
 
 
+//private boolean handleHeroAttack(Hero hero) {
+//    // Get attackable monsters
+//    List<Monster> attackableMonsters = getAttackableMonsters(hero);
+//
+//    // Check if there are any monsters to attack
+//    if (attackableMonsters.isEmpty()) {
+//        ioHelper.println("No monsters in range to attack!");
+//        return false    ;
+//    }
+//
+//    // Display attackable monsters
+//    displayAttackableMonsters(attackableMonsters);
+//
+//    // Get player's choice
+//    int choice = ioHelper.nextLineInt(
+//            "Choose monster to attack (1-" + attackableMonsters.size() + "): ",
+//            "Invalid choice",
+//            i -> i >= 1 && i <= attackableMonsters.size()
+//    );
+//
+//    // Attack chosen monster
+//    Monster target = attackableMonsters.get(choice - 1);
+//    performHeroAttack(hero, target);
+//    return true;
+//}
 private boolean handleHeroAttack(Hero hero) {
     // Get attackable monsters
-    List<Monster> attackableMonsters = getAttackableMonsters(hero);
+    List<Monster> attackableMonsters = new ArrayList<>();
+    Position heroPos = hero.getCurrentPosition();
 
-    // Check if there are any monsters to attack
+    // Check all adjacent positions including current position for monsters
+    for (Monster monster : monsterParty.getAllMonsters()) {
+        Position monsterPos = monster.getCurrentPosition();
+        int dx = Math.abs(heroPos.getX() - monsterPos.getX());
+        int dy = Math.abs(heroPos.getY() - monsterPos.getY());
+
+        // Monster is in range if it's in current space or adjacent (no diagonals)
+        if ((dx == 0 && dy == 0) || (dx + dy == 1)) {
+            attackableMonsters.add(monster);
+        }
+    }
+
     if (attackableMonsters.isEmpty()) {
         ioHelper.println("No monsters in range to attack!");
-        return false    ;
+        return false;
     }
 
     // Display attackable monsters
-    displayAttackableMonsters(attackableMonsters);
+    ioHelper.println("\nMonsters in range:");
+    for (int i = 0; i < attackableMonsters.size(); i++) {
+        Monster m = attackableMonsters.get(i);
+        ioHelper.println((i+1) + ". " + m.getName() +
+                " (HP: " + m.getHp() + ", Position: " + m.getCurrentPosition() + ")");
+    }
 
     // Get player's choice
     int choice = ioHelper.nextLineInt(
@@ -256,7 +435,38 @@ private boolean handleHeroAttack(Hero hero) {
 
     // Attack chosen monster
     Monster target = attackableMonsters.get(choice - 1);
-    performHeroAttack(hero, target);
+    double damage = hero.damageValue();
+
+    if (target.dodged()) {
+        ioHelper.println(target.getName() + " dodged the attack!");
+        displayBoard();  // Show board after dodge
+        return true;
+    }
+
+    target.takeDamage(damage);
+    ioHelper.println(hero.getName() + " dealt " + damage + " damage to " +
+            target.getName() + "!");
+
+    if (target.getHp() <= 0) {
+        ioHelper.println(target.getName() + " has been defeated!");
+        board.removeMonster(target.getCurrentPosition());
+        monsterParty.removeMonster(target);
+//        distributeRewards(target);
+
+        int goldReward = 500 * target.getLevel();
+        for (Hero h : heroParty.getHeroes()) {
+            h.increaseGold((double)goldReward);
+            ioHelper.println(h.getName() + " received " + goldReward + " gold!");
+        }
+        // Display updated board after monster defeat
+        ioHelper.println("\nAfter monster defeat:");
+        displayBoard();
+    }else {
+        // Display board after attack
+        ioHelper.println("\nAfter attack:");
+        displayBoard();
+    }
+
     return true;
 }
 

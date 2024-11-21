@@ -1,7 +1,6 @@
 /*
  * All types of potions
 */
-
 public enum PotionType {
     HP("Health"),
     MP("Mana"),

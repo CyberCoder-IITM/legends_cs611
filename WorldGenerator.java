@@ -6,6 +6,7 @@ import java.util.*;
 
 public class WorldGenerator {
     private Random rand;
+    private Board<CellType> board;  // Add this field
     private static final int BOARD_SIZE = 8;
     private static final int NUM_HEROES = 3;
     private static final int NUM_LANES = 3;
@@ -22,7 +23,8 @@ public class WorldGenerator {
 
     public Legends generate() {
         // Create board with Nexus and lane dividers
-        Board<CellType> board = createBoard();
+//        Board<CellType> board = createBoard();
+        this.board = createBoard();  // Assign to field
 
         // Create lanes
         List<Lane> lanes = createLanes();
@@ -152,6 +154,11 @@ public class WorldGenerator {
 
             Position nexusPos = lanes.get(i).getHeroNexus();
             Hero hero = Heroes.createHeroForLane(baseHero, nexusPos, lanes.get(i));
+
+
+            // Add these lines:
+            board.placeHero(nexusPos, hero);  // Place hero on board
+            hero.setCurrentPosition(nexusPos);        // Set hero's position
 
             heroes.add(hero);
             lanes.get(i).assignHero(hero);

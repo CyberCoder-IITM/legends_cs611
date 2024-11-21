@@ -16,6 +16,26 @@ public class RandomMonsterFactory implements MonsterFactory {
     private static final int MEDIUM_SPAWN_RATE = 4;
     private static final int HARD_SPAWN_RATE = 2;
 
+    public Monster createMonster(int heroLevel, Position spawnPosition, Lane lane) {
+        // Get random base monster
+        Monster baseMonster = Monsters.random(new Random());
+
+        // Scale monster to hero level
+        double levelRatio = (double) heroLevel / baseMonster.getLevel();
+
+        return new Monster(
+                baseMonster.getName(),
+                baseMonster.getType(),
+                heroLevel,
+                baseMonster.getHp() * levelRatio,
+                baseMonster.getDamage() * levelRatio,
+                baseMonster.getDefense() * levelRatio,
+                baseMonster.getDodge(),
+                spawnPosition,
+                lane
+        );
+    }
+
     public RandomMonsterFactory(GameDifficulty difficulty) {
         this.rand = new Random();
         this.roundCounter = 0;

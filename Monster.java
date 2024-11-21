@@ -83,6 +83,13 @@ public class Monster {
         }
     }
 
+    public void setCurrentPosition(Position position) {
+        if (position == null) {
+            throw new IllegalArgumentException("Position cannot be null");
+        }
+        this.currentPosition = position;
+    }
+
     public void setPosition(Position position) {
         this.currentPosition = position;
     }

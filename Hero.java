@@ -10,7 +10,9 @@ public class Hero {
     private HeroStats stats;
     private int gold;
     private Set<Item> inventory;
-//    private Map<EquipmentSlot, Item> equippedItems;
+    private IOHelper ioHelper;
+    private Board<CellType> board;
+    //    private Map<EquipmentSlot, Item> equippedItems;
 protected Map<EquipmentSlot, Item> equippedItems;
     private Position currentPosition;
     private Position nexusPosition;
@@ -23,6 +25,7 @@ protected Map<EquipmentSlot, Item> equippedItems;
                 Position nexusPosition, Lane lane) {
         this.inCombat = false;
         this.name = name;
+        this.board = board;
         this.type = type;
         this.level = level;
         this.exp = exp;
@@ -50,6 +53,11 @@ protected Map<EquipmentSlot, Item> equippedItems;
 
     // Movement methods
     public boolean move(Direction direction, Board<CellType> board) {
+
+        if (currentPosition == null) {
+            return false;
+        }
+
         Position newPosition = currentPosition.move(direction);
 
         if (!isValidMove(newPosition, board)) {
@@ -57,13 +65,24 @@ protected Map<EquipmentSlot, Item> equippedItems;
         }
 
         // Remove current terrain effects
-        board.removeTerrainEffect(currentPosition, this);
+//        board.removeTerrainEffect(currentPosition, this);
+        // Remove terrain effects from current position
+        if (board.hasTerrainEffect(currentPosition)) {
+            board.removeTerrainEffect(currentPosition, this);
+        }
 
         // Update position
+        board.removeHero(currentPosition);
         currentPosition = newPosition;
+        board.placeHero(currentPosition, this);
+
 
         // Apply new terrain effects
-        board.applyTerrainEffect(currentPosition, this);
+//        board.applyTerrainEffect(currentPosition, this);
+        // Apply new terrain effects
+        if (board.hasTerrainEffect(currentPosition)) {
+            board.applyTerrainEffect(currentPosition, this);
+        }
 
         return true;
     }
@@ -306,14 +325,51 @@ protected Map<EquipmentSlot, Item> equippedItems;
     }
 
     private boolean isValidMove(Position newPos, Board<CellType> board) {
-        return board.isValid(newPos) &&
-                !board.isInaccessible(newPos) &&
-                !board.hasHero(newPos) &&
-                !hasMonsterAhead(newPos, board);
+
+        // Check basic validity
+        if (!board.isValid(newPos)) {
+            return false;
+        }
+
+        // Check if position is in assigned lane
+        if (!assignedLane.contains(newPos)) {
+            return false;
+        }
+
+        // Check for inaccessible spaces
+        if (board.isInaccessible(newPos)) {
+            return false;
+        }
+
+        // Check for other heroes
+        if (board.hasHero(newPos)) {
+            return false;
+        }
+
+        // Check for monsters ahead
+        if (hasMonsterAhead(newPos, board)) {
+            return false;
+        }
+
+        return true;
+
     }
 
-    private boolean hasMonsterAhead(Position pos, Board<CellType> board) {
-        return assignedLane.hasMonsterAhead(pos);
+//    private boolean hasMonsterAhead(Position pos, Board<CellType> board) {
+//        return assignedLane.hasMonsterAhead(pos);
+//    }
+
+    private boolean hasMonsterAhead(Position newPos, Board<CellType> board) {
+        // Check if trying to move behind a monster
+        if (newPos.getX() < currentPosition.getX()) {  // Moving north
+            for (int row = newPos.getX(); row <= currentPosition.getX(); row++) {
+                Position checkPos = new Position(row, newPos.getY());
+                if (board.hasMonster(checkPos)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private boolean canTeleportTo(Position target, Board<CellType> board) {
@@ -321,4 +377,9 @@ protected Map<EquipmentSlot, Item> equippedItems;
                 !board.hasHero(target) &&
                 !assignedLane.hasMonsterAhead(target);
     }
+
+    public void setCurrentPosition(Position position) {
+        this.currentPosition = position;
+    }
+
 }
