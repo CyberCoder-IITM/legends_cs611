@@ -108,14 +108,23 @@ public class HeroStats {
         }
     }
 
-    public void restorePercentHP(double percent) {
-        double amount = maxHp * percent;
-        increaseHP(amount);
-    }
+//    public void restorePercentHP(double percent) {
+//        double amount = maxHp * percent;
+//        increaseHP(amount);
+//    }
+public void restorePercentHP(double percent) {
+    double amount = maxHp * percent;
+    hp = Math.min(maxHp, hp + amount);
+}
+
+//    public void restorePercentMP(double percent) {
+//        double amount = maxMp * percent;
+//        increaseMP(amount);
+//    }
 
     public void restorePercentMP(double percent) {
         double amount = maxMp * percent;
-        increaseMP(amount);
+        mp = Math.min(maxMp, mp + amount);
     }
 
     // Respawn restoration

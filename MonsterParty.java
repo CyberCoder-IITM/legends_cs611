@@ -9,6 +9,8 @@ public class MonsterParty {
     private Map<Lane, List<Monster>> monstersByLane;
     private static final double GOLD_REWARD_MULTIPLIER = 500;
     private static final int EXP_REWARD_MULTIPLIER = 2;
+    private static final int SPAWN_FREQUENCY = 8;  // Spawn every 8 rounds per PDF
+
 
     public MonsterParty(Set<Monster> monsters) {
         this.monsters = new HashSet<>(monsters);
@@ -23,6 +25,8 @@ public class MonsterParty {
 
     // Add this method for spawning new wave
     public void spawnNewWave(List<Lane> lanes, int heroMaxLevel) {
+        System.out.println("\nNew monsters are spawning!");
+
         // Create one monster per lane
         for (Lane lane : lanes) {
             // Get base monster
@@ -45,15 +49,29 @@ public class MonsterParty {
 
             // Add monster to collections
             addMonster(scaledMonster, lane);
+            System.out.println("Spawned " + scaledMonster.getName() +
+                    " (Level " + heroMaxLevel + ") in lane " +
+                    (lane.getLaneNumber() + 1));
         }
     }
 
+
     // Helper method to add monster to both collections
-    private void addMonster(Monster monster, Lane lane) {
-        monsters.add(monster);
+//    private void addMonster(Monster monster, Lane lane) {
+//        monsters.add(monster);
+//        monstersByLane.computeIfAbsent(lane, k -> new ArrayList<>())
+//                .add(monster);
+//        lane.addMonster(monster);  // Also add to lane
+//    }
+    public void addMonster(Monster monster, Lane lane) {
+        // Remove any existing monster at the same position
+        Position pos = monster.getCurrentPosition();
+        monstersByLane.get(lane).removeIf(m ->
+                m.getCurrentPosition().equals(pos));
+
+        // Add new monster
         monstersByLane.computeIfAbsent(lane, k -> new ArrayList<>())
                 .add(monster);
-        lane.addMonster(monster);  // Also add to lane
     }
 
     private void initializeMonsterLanes() {
@@ -81,19 +99,110 @@ public class MonsterParty {
         }
     }
 
-    public void removeMonster(Monster monster) {
-        monsters.remove(monster);
-        if (monster.getAssignedLane() != null) {
-            monstersByLane.get(monster.getAssignedLane()).remove(monster);
+    public void removeDeadMonsters() {
+        for (List<Monster> monsters : monstersByLane.values()) {
+            monsters.removeIf(monster -> monster.getHp() <= 0);
         }
     }
 
-    public void handleMonsterMovement(Board<CellType> board) {
-        for (Monster monster : new ArrayList<>(monsters)) {  // Copy to avoid concurrent modification
-            if (!canAttackAnyHero(monster, board)) {
-                moveMonsterForward(monster, board);
+    public void spawnNewMonsters(List<Lane> lanes, int heroMaxLevel) {
+        // Only spawn if it's the right round
+        System.out.println("\nNew monsters are spawning!");
+
+        for (Lane lane : lanes) {
+            // Get base monster
+            Monster baseMonster = Monsters.random(new Random());
+            Position spawnPos = lane.getMonsterNexus();
+
+            // Scale monster to hero level
+            Monster scaledMonster = new Monster(
+                    baseMonster.getName(),
+                    baseMonster.getType(),
+                    heroMaxLevel,
+                    baseMonster.getHp() * (heroMaxLevel / baseMonster.getLevel()),
+                    baseMonster.getDamage() * (heroMaxLevel / baseMonster.getLevel()),
+                    baseMonster.getDefense() * (heroMaxLevel / baseMonster.getLevel()),
+                    baseMonster.getDodge(),
+                    spawnPos,
+                    lane
+            );
+
+            addMonster(scaledMonster, lane);
+            System.out.println("Spawned " + scaledMonster.getName() +
+                    " (Level " + heroMaxLevel + ") in lane " +
+                    (lane.getLaneNumber() + 1));
+        }
+    }
+
+//    public void removeMonster(Monster monster) {
+//        monsters.remove(monster);
+//        if (monster.getAssignedLane() != null) {
+//            monstersByLane.get(monster.getAssignedLane()).remove(monster);
+//        }
+//    }
+
+    public void removeMonster(Monster monster) {
+        Lane lane = monster.getAssignedLane();
+        if (lane != null && monstersByLane.containsKey(lane)) {
+            monstersByLane.get(lane).remove(monster);
+        }
+    }
+
+    public boolean handleMonstersTurn(Board<CellType> board, HeroParty heroParty) {
+        // Process each lane separately
+        for (Lane lane : monstersByLane.keySet()) {
+            List<Monster> laneMonsters = monstersByLane.get(lane);
+
+            // Process monsters from bottom to top to avoid collision issues
+            for (int i = laneMonsters.size() - 1; i >= 0; i--) {
+                Monster monster = laneMonsters.get(i);
+                boolean attacked = false;
+
+                // Check for heroes in attack range
+                for (Hero hero : heroParty.getHeroes()) {
+                    if (monster.canAttack(hero.getCurrentPosition())) {
+                        double damage = monster.getDamage();
+                        hero.takeDamage(damage);
+                        System.out.println(monster.getName() + " attacks " +
+                                hero.getName() + " for " + damage + " damage!");
+                        attacked = true;
+                        break;
+                    }
+                }
+
+                // If couldn't attack, move forward
+                if (!attacked) {
+                    Position currentPos = monster.getCurrentPosition();
+                    Position newPos = new Position(currentPos.getX() + 1, currentPos.getY());
+
+                    if (canMoveToPosition(newPos, board)) {
+                        // Remove from old position
+                        board.removeMonster(currentPos);
+
+                        // Update position
+                        monster.setCurrentPosition(newPos);
+
+                        // Add to new position
+                        board.placeMonster(newPos, monster);
+
+                        System.out.println(monster.getName() + " moves forward!");
+
+                        // Check victory condition
+                        if (newPos.isHeroNexus()) {
+                            return false;
+                        }
+                    }
+                }
             }
         }
+        return true;
+    }
+
+    private boolean canMoveToPosition(Position pos, Board<CellType> board) {
+        return board.isValid(pos) &&
+                !board.isInaccessible(pos) &&
+                !board.hasMonster(pos) &&
+                !board.hasHero(pos);
     }
 
     private boolean canAttackAnyHero(Monster monster, Board<CellType> board) {
@@ -166,17 +275,6 @@ private void performMonsterAttack(Monster monster, Hero hero) {
     public boolean hasMonsterReachedNexus() {
         return monsters.stream()
                 .anyMatch(m -> m.getCurrentPosition().isHeroNexus());
-    }
-
-    public void removeDeadMonsters() {
-        Iterator<Monster> iterator = monsters.iterator();
-        while (iterator.hasNext()) {
-            Monster monster = iterator.next();
-            if (monster.getHp() <= 0) {
-                monstersByLane.get(monster.getAssignedLane()).remove(monster);
-                iterator.remove();
-            }
-        }
     }
 
     public List<Monster> getAllMonsters() {

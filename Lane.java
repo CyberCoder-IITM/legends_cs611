@@ -32,9 +32,18 @@ public class Lane {
         return lanePositions;
     }
 
-    public boolean hasMonsterAt(Position position) {
+
+public boolean hasMonsterAt(Position position) {
+    // Check exact position match
+    return monsters.stream()
+            .anyMatch(m -> m.getCurrentPosition().equals(position));
+}
+
+    public boolean hasMonsterAhead(Position position) {
+        // Check if any monster is ahead (north) of the given position in same lane
         return monsters.stream()
-                .anyMatch(m -> m.getCurrentPosition().equals(position));
+                .anyMatch(m -> m.getCurrentPosition().getX() < position.getX() &&
+                        m.getCurrentPosition().getY() == position.getY());
     }
 
     // Add method to get adjacent positions within lane
@@ -114,9 +123,38 @@ public class Lane {
         this.assignedHero = hero;
     }
 
+
     public void addMonster(Monster monster) {
+        Position pos = monster.getCurrentPosition();
+
+        // Check if position is valid for this lane
+        if (!contains(pos)) {
+            return;
+        }
+
+        // Remove any existing monster at the same position
+        monsters.removeIf(m -> m.getCurrentPosition().equals(pos));
+
+        // Add new monster
         monsters.add(monster);
     }
+
+    public boolean canAddMonsterAt(Position pos) {
+        // Check if position is in this lane
+        if (!contains(pos)) {
+            return false;
+        }
+
+        // Check if position is already occupied by a monster
+        if (hasMonsterAt(pos)) {
+            return false;
+        }
+
+        // Check if position is monster nexus or valid lane position
+        return pos.equals(monsterNexus) || positions.contains(pos);
+    }
+
+
 
     public void removeMonster(Monster monster) {
         monsters.remove(monster);
@@ -142,11 +180,6 @@ public class Lane {
         return laneNumber;
     }
 
-    public boolean hasMonsterAhead(Position position) {
-        return monsters.stream()
-                .anyMatch(m -> m.getCurrentPosition().getX() < position.getX() &&
-                        m.getCurrentPosition().getY() == position.getY());
-    }
 
     public List<Monster> getMonstersInRange(Position position) {
         return monsters.stream()

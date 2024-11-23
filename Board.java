@@ -181,43 +181,156 @@ public class Board<T> {
         }
     }
 
+//    // In Board.java
+//    public void display() {
+//        System.out.println("\nCurrent Board State:");
+//        System.out.println("\nI: Inaccessible  N: Nexus  P: Plain  B: Bush  C: Cave  K: Koulou");
+//        System.out.println("H1/H2/H3: Heroes  M1/M2/M3: Monsters  X: Combat\n");
+//
+//        // Print column numbers with proper spacing
+//        System.out.print("    ");
+//        for (int j = 0; j < cols; j++) {
+//            System.out.print(j + "   ");
+//        }
+//        System.out.println();
+//
+//
+//        // Print board content
+//        for (int i = 0; i < rows; i++) {
+//            System.out.print(i + " ||");
+//            for (int j = 0; j < cols; j++) {
+//                Position currentPos = new Position(i, j);
+//
+//                if (hasHero(currentPos) && hasMonster(currentPos)) {
+//                    System.out.print(" X  |");
+//                } else if (hasHero(currentPos)) {
+//                    Hero hero = heroPositions.get(currentPos);
+//                    System.out.print(" H" + (hero.getAssignedLane().getLaneNumber() + 1) + " |");
+//                } else if (hasMonster(currentPos)) {
+//                    Monster monster = monsterPositions.get(currentPos);
+//                    System.out.print(" M" + (monster.getAssignedLane().getLaneNumber() + 1) + " |");
+//                } else {
+//                    CellType cellType = (CellType)at(currentPos).getValue();
+//                    System.out.print(" " + getCellSymbol(cellType) + "  |");
+//                }
+//            }
+//            System.out.println("|");
+//        }
+//    }
+//
+
+
+
     // In Board.java
+
     public void display() {
         System.out.println("\nCurrent Board State:");
         System.out.println("\nI: Inaccessible  N: Nexus  P: Plain  B: Bush  C: Cave  K: Koulou");
         System.out.println("H1/H2/H3: Heroes  M1/M2/M3: Monsters  X: Combat\n");
 
-        // Print column numbers with proper spacing
+        // Print column numbers
         System.out.print("    ");
         for (int j = 0; j < cols; j++) {
             System.out.print(j + "   ");
         }
         System.out.println();
 
-
         // Print board content
         for (int i = 0; i < rows; i++) {
-            System.out.print(i + " ||");
+            System.out.print(i + " ");
             for (int j = 0; j < cols; j++) {
                 Position currentPos = new Position(i, j);
 
+                // Start cell
+                if (isSpecialCell(i, j)) {
+                    System.out.print("|[");
+                } else {
+                    System.out.print("| ");
+                }
+
+                // Cell content
                 if (hasHero(currentPos) && hasMonster(currentPos)) {
-                    System.out.print(" X  |");
+                    System.out.print("X");
                 } else if (hasHero(currentPos)) {
                     Hero hero = heroPositions.get(currentPos);
-                    System.out.print(" H" + (hero.getAssignedLane().getLaneNumber() + 1) + " |");
+                    System.out.print("H" + (hero.getAssignedLane().getLaneNumber() + 1));
                 } else if (hasMonster(currentPos)) {
                     Monster monster = monsterPositions.get(currentPos);
-                    System.out.print(" M" + (monster.getAssignedLane().getLaneNumber() + 1) + " |");
+                    System.out.print("M" + (monster.getAssignedLane().getLaneNumber() + 1));
                 } else {
                     CellType cellType = (CellType)at(currentPos).getValue();
-                    System.out.print(" " + getCellSymbol(cellType) + "  |");
+                    System.out.print(getCellSymbol(cellType));
+                }
+
+                // End cell
+                if (isSpecialCell(i, j)) {
+                    System.out.print("]");
+                } else {
+                    System.out.print(" ");
                 }
             }
             System.out.println("|");
+
+            // Print horizontal separator
+            System.out.print("  ");
+            for (int j = 0; j < cols; j++) {
+                System.out.print("----");
+            }
+            System.out.println("-");
         }
     }
 
+    // Helper method to determine if a cell should have brackets
+    private boolean isSpecialCell(int row, int col) {
+        Position pos = new Position(row, col);
+
+        // Check if it's a hero or monster position
+        boolean hasHeroOrMonster = hasHero(pos) || hasMonster(pos);
+
+        // Check if it's a nexus
+        boolean isNexus = at(pos).getValue() == CellType.NEXUS;
+
+        // Special cells are heroes, monsters, or nexuses in the first and last rows
+        return (row == 0 || row == rows - 1) && (hasHeroOrMonster || isNexus);
+    }
+
+    // Optional: Color support class
+    public class ConsoleColors {
+        // Reset
+        public static final String RESET = "\033[0m";
+
+        // Regular Colors
+        public static final String GREEN = "\033[0;32m";    // GREEN
+        public static final String BLUE = "\033[0;34m";     // BLUE
+        public static final String PURPLE = "\033[0;35m";   // PURPLE
+        public static final String CYAN = "\033[0;36m";     // CYAN
+
+        // Bold
+        public static final String RED_BOLD = "\033[1;31m";    // RED
+        public static final String YELLOW_BOLD = "\033[1;33m"; // YELLOW
+    }
+
+    // If you want to add colors, here's the Java 8 compatible version
+    private String getCellSymbol(CellType cellType) {
+        if (cellType == null) return " ";
+
+        switch (cellType) {
+            case BUSH:
+                return ConsoleColors.GREEN + "🌳" + ConsoleColors.RESET;
+            case CAVE:
+                return ConsoleColors.PURPLE + "⛰️" + ConsoleColors.RESET;
+            case KOULOU:
+                return ConsoleColors.YELLOW_BOLD + "⚡" + ConsoleColors.RESET;
+            case PLAIN:
+                return "·";
+            case NEXUS:
+                return ConsoleColors.CYAN + "N" + ConsoleColors.RESET;
+            case INACCESSIBLE:
+                return ConsoleColors.RED_BOLD + "X" + ConsoleColors.RESET;
+            default:
+                return " ";
+        }
+    }
 
     public boolean hasHero(Position p) {
         boolean has = heroPositions.containsKey(p);
@@ -225,15 +338,15 @@ public class Board<T> {
     }
 
 
-    private String getCellSymbol(CellType cellType) {
-        switch(cellType) {
-            case NEXUS: return "N";
-            case INACCESSIBLE: return "I";
-            case BUSH: return "B";
-            case CAVE: return "C";
-            case KOULOU: return "K";
-            case PLAIN: return "P";
-            default: return " ";
-        }
-    }
+//    private String getCellSymbol(CellType cellType) {
+//        switch(cellType) {
+//            case NEXUS: return "N";
+//            case INACCESSIBLE: return "I";
+//            case BUSH: return "B";
+//            case CAVE: return "C";
+//            case KOULOU: return "K";
+//            case PLAIN: return "P";
+//            default: return " ";
+//        }
+//    }
 }

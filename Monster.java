@@ -1,7 +1,6 @@
 /*
  * Represents a monster
-// */
-
+ */
 import java.util.Random;
 
 public class Monster {
@@ -60,9 +59,30 @@ public class Monster {
     }
 
     private boolean canMove(Position newPos, Board<CellType> board) {
-        return board.isValid(newPos) &&
-                !board.isInaccessible(newPos) &&
-                !board.hasMonster(newPos);
+//        return board.isValid(newPos) &&
+//                !board.isInaccessible(newPos) &&
+//                !board.hasMonster(newPos);
+        // Check basic validity
+        if (!board.isValid(newPos)) {
+            return false;
+        }
+
+        // Check for inaccessible spaces
+        if (board.isInaccessible(newPos)) {
+            return false;
+        }
+
+        // Check for other monsters
+        if (board.hasMonster(newPos)) {
+            return false;
+        }
+
+        // Check for heroes blocking path
+        if (board.hasHero(newPos)) {
+            return false;
+        }
+
+        return true;
     }
 
     public boolean canAttack(Position targetPosition) {

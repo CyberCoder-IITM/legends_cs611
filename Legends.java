@@ -18,6 +18,7 @@ public class Legends {
     private int currentRound;
     private Monsters.SpawnFrequency spawnFrequency;
 
+
     public Legends(Board<CellType> board,
                    List<Lane> lanes,
                    HeroParty heroParty,
@@ -35,17 +36,17 @@ public class Legends {
         this.monsterFactory = monsterFactory;
         this.ioHelper = ioHelper;
         this.monsterParty = new MonsterParty();
-        this.currentRound = 0;
+        this.currentRound = 1;
         this.spawnFrequency = Monsters.SpawnFrequency.MEDIUM;
 
-        spawnNewMonsters();
     }
 
     public void play() {
         displayWelcomeMessage();
-        if (monsterParty.getAllMonsters().isEmpty()) {
-            spawnNewMonsters();
-        }
+//        if (monsterParty.getAllMonsters().isEmpty()) {
+//            spawnNewMonsters();
+//        }
+        spawnNewMonsters();
 
         while (true) {
 //            currentRound++;
@@ -121,66 +122,9 @@ public class Legends {
     }
 
 
-    private boolean handleHeroesTurn() {
-        for (Hero hero : heroParty.getHeroes()) {
-            displayHeroStatus(hero);
-
-            while (true) {
-                String action = ioHelper.nextLine(
-                        "Choose action:\n" +
-                                "1. Move (W/A/S/D)\n" +
-                                "2. Attack\n" +
-                                "3. Cast Spell\n" +
-                                "4. Teleport\n" +
-                                "5. Recall\n" +
-                                "6. Use Item\n" +
-                                "7. Market (only in Nexus)\n" +
-                                "Q. Quit\n" +
-                                "Choice: ",
-                        "Invalid choice",
-                        s -> "1234567Qq".contains(s)
-                );
-
-                if (action.equalsIgnoreCase("Q")) {
-                    return false;
-                }
-
-                if (executeHeroAction(hero, action)) {
-                    if (hero.getCurrentPosition().isMonsterNexus()) {
-                        return false; // Heroes win
-                    }
-                    break;
-                }
-            }
-        }
-        return true;
-    }
-
-    private boolean handleMonstersTurn() {
-        for (Monster monster : monsterParty.getAllMonsters()) {
-            boolean attacked = false;
-            for (Hero hero : heroParty.getHeroes()) {
-                if (monster.canAttack(hero.getCurrentPosition())) {
-                    double damage = monster.getDamage();
-                    hero.takeDamage(damage);
-                    ioHelper.println(monster.getName() + " attacks " + hero.getName() + " for " + damage + " damage!");
-                    attacked = true;
-                    break;
-                }
-            }
-
-            if (!attacked) {
-                Position newPos = new Position(monster.getCurrentPosition().getX() + 1, monster.getCurrentPosition().getY());
-                if (board.isValid(newPos) && !board.isInaccessible(newPos) && !board.hasMonster(newPos)) {
-                    board.removeMonster(monster.getCurrentPosition());
-                    monster.setCurrentPosition(newPos);
-                    board.placeMonster(newPos, monster);
-                    ioHelper.println(monster.getName() + " moves forward!");
-                }
-            }
-        }
-        return true;
-    }
+private boolean handleMonstersTurn() {
+    return monsterParty.handleMonstersTurn(board, heroParty);
+}
 
 
 
@@ -191,6 +135,16 @@ public class Legends {
                 hero.getStats().restorePercentHP(0.1);
                 hero.getStats().restorePercentMP(0.1);
             }
+        }
+
+        // Spawn new monsters every 8 rounds
+//        if (currentRound % 8 == 0) {
+//            ioHelper.println("\nNew monsters are spawning!");
+//            spawnNewMonsters();
+//        }
+        // Spawn new monsters every 8 rounds
+        if (currentRound > 0 && currentRound % 8 == 0) {
+            spawnNewMonsters();
         }
 
         // Respawn dead heroes
@@ -207,6 +161,7 @@ public class Legends {
 
 
 private void spawnNewMonsters() {
+    // Get highest hero level for scaling
     int maxHeroLevel = heroParty.getHighestLevel();
 
     // Spawn one monster per lane
@@ -215,6 +170,8 @@ private void spawnNewMonsters() {
         Monster monster = monsterFactory.createMonster(maxHeroLevel, spawnPos, lane);
         monsterParty.addMonster(monster);
         board.placeMonster(spawnPos, monster);
+        ioHelper.println("Spawned " + monster.getName() + " (Level " + maxHeroLevel + ") in lane " +
+                (lane.getLaneNumber() + 1));
     }
 }
 
@@ -260,6 +217,26 @@ private void spawnNewMonsters() {
         board.display();
     }
 
+    private void checkVictoryConditions() {
+        // Check if any hero reached monster nexus
+        for (Hero hero : heroParty.getHeroes()) {
+            if (hero.getCurrentPosition().isMonsterNexus()) {
+                handleVictory(true);
+                return;
+            }
+        }
+
+        // Check if any monster reached hero nexus
+        for (Monster monster : monsterParty.getAllMonsters()) {
+            if (monster.getCurrentPosition().isHeroNexus()) {
+                handleVictory(false);
+                return;
+            }
+        }
+    }
+
+
+
     private void handleVictory(boolean heroesWon) {
         if (heroesWon) {
             ioHelper.println("\nVICTORY! The heroes have reached the monster's nexus!");
@@ -267,6 +244,7 @@ private void spawnNewMonsters() {
             ioHelper.println("\nDEFEAT! The monsters have reached your nexus!");
         }
         displayFinalStats();
+//        System.exit(0);
     }
 
     // Additional helper methods....
