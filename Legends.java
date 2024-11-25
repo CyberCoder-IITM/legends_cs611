@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 /*
  * The core component where the game is played
 */
-public class Legends {
+public class Legends implements RPGGame {
     private Board<CellType> board;
     private List<Lane> lanes;
     private HeroParty heroParty;

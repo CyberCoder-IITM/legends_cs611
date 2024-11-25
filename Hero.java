@@ -1,19 +1,22 @@
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /*
  * Represents a hero
 // */
-public class Hero {
-    private String name;
+public class Hero extends Living {
     private HeroType type;
-    private int level;
+
     private int exp;
     private HeroStats stats;
     private int gold;
     private Set<Item> inventory;
     private IOHelper ioHelper;
     private Board<CellType> board;
-    //    private Map<EquipmentSlot, Item> equippedItems;
-protected Map<EquipmentSlot, Item> equippedItems;
+    // private Map<EquipmentSlot, Item> equippedItems;
+    protected Map<EquipmentSlot, Item> equippedItems;
     private Position currentPosition;
     private Position nexusPosition;
     private Lane assignedLane;
@@ -21,13 +24,12 @@ protected Map<EquipmentSlot, Item> equippedItems;
     private static final double RESTORE_RATE = 0.10; // 10% restoration
 
     public Hero(String name, HeroType type, int level, int exp, HeroStats stats,
-                int gold, Set<Item> inventory, Map<EquipmentSlot, Item> equippedItems,
-                Position nexusPosition, Lane lane) {
+            int gold, Set<Item> inventory, Map<EquipmentSlot, Item> equippedItems,
+            Position nexusPosition, Lane lane) {
+        super(name, level);
         this.inCombat = false;
-        this.name = name;
         this.board = board;
         this.type = type;
-        this.level = level;
         this.exp = exp;
         this.stats = stats;
         this.gold = gold;
@@ -39,17 +41,41 @@ protected Map<EquipmentSlot, Item> equippedItems;
     }
 
     // Basic getters
-    public String getName() { return name; }
-    public HeroType getType() { return type; }
-    public int getLevel() { return level; }
-    public int getExp() { return exp; }
-    public HeroStats getStats() { return stats; }
-    public int getGold() { return gold; }
-    public Set<Item> getInventory() { return inventory; }
-    public Collection<Item> getEquippedItems() { return equippedItems.values(); }
-    public Position getCurrentPosition() { return currentPosition; }
-    public Position getNexusPosition() { return nexusPosition; }
-    public Lane getAssignedLane() { return assignedLane; }
+    public HeroType getType() {
+        return type;
+    }
+
+    public int getExp() {
+        return exp;
+    }
+
+    public HeroStats getStats() {
+        return stats;
+    }
+
+    public int getGold() {
+        return gold;
+    }
+
+    public Set<Item> getInventory() {
+        return inventory;
+    }
+
+    public Collection<Item> getEquippedItems() {
+        return equippedItems.values();
+    }
+
+    public Position getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public Position getNexusPosition() {
+        return nexusPosition;
+    }
+
+    public Lane getAssignedLane() {
+        return assignedLane;
+    }
 
     // Movement methods
     public boolean move(Direction direction, Board<CellType> board) {
@@ -65,7 +91,7 @@ protected Map<EquipmentSlot, Item> equippedItems;
         }
 
         // Remove current terrain effects
-//        board.removeTerrainEffect(currentPosition, this);
+        // board.removeTerrainEffect(currentPosition, this);
         // Remove terrain effects from current position
         if (board.hasTerrainEffect(currentPosition)) {
             board.removeTerrainEffect(currentPosition, this);
@@ -76,9 +102,8 @@ protected Map<EquipmentSlot, Item> equippedItems;
         currentPosition = newPosition;
         board.placeHero(currentPosition, this);
 
-
         // Apply new terrain effects
-//        board.applyTerrainEffect(currentPosition, this);
+        // board.applyTerrainEffect(currentPosition, this);
         // Apply new terrain effects
         if (board.hasTerrainEffect(currentPosition)) {
             board.applyTerrainEffect(currentPosition, this);
@@ -99,7 +124,6 @@ protected Map<EquipmentSlot, Item> equippedItems;
     public void setInCombat(boolean inCombat) {
         this.inCombat = inCombat;
     }
-
 
     public boolean doItemAction(Item item) {
         if (!canUseItem(item)) {
@@ -124,7 +148,7 @@ protected Map<EquipmentSlot, Item> equippedItems;
         }
 
         // Check if hero has enough mana
-        if (stats.getMp() < ((Spell)spell).getManaCost()) {
+        if (stats.getMp() < ((Spell) spell).getManaCost()) {
             return false;
         }
 
@@ -134,15 +158,15 @@ protected Map<EquipmentSlot, Item> equippedItems;
         }
 
         // Apply spell damage and effect
-        double damage = calculateSpellDamage((Spell)spell);
+        double damage = calculateSpellDamage((Spell) spell);
         target.takeDamage(damage);
 
         // Reduce hero's mana
-        stats.decreaseMP(((Spell)spell).getManaCost());
+        stats.decreaseMP(((Spell) spell).getManaCost());
 
         // Apply spell effect if target is still alive
         if (target.getHp() > 0) {
-            ((Spell)spell).applyEffect(target);
+            ((Spell) spell).applyEffect(target);
         }
 
         return true;
@@ -150,7 +174,7 @@ protected Map<EquipmentSlot, Item> equippedItems;
 
     private boolean canUseItem(Item item) {
         // Check level requirement
-        if (level < item.getLevelRequirement()) {
+        if (this.getLevel() < item.getLevelRequirement()) {
             return false;
         }
 
@@ -172,7 +196,6 @@ protected Map<EquipmentSlot, Item> equippedItems;
         return damage;
     }
 
-
     // Optional: Add method to check for nearby monsters
     private boolean hasNearbyMonsters() {
         if (currentPosition == null || assignedLane == null) {
@@ -187,8 +210,6 @@ protected Map<EquipmentSlot, Item> equippedItems;
         }
         return false;
     }
-
-
 
     public boolean teleport(Position targetPosition, Board<CellType> board) {
         if (!canTeleportTo(targetPosition, board)) {
@@ -264,7 +285,6 @@ protected Map<EquipmentSlot, Item> equippedItems;
             }
         }
     }
-
 
     // Equipment methods
     public boolean equip(Weapon weapon) {
@@ -355,13 +375,13 @@ protected Map<EquipmentSlot, Item> equippedItems;
 
     }
 
-//    private boolean hasMonsterAhead(Position pos, Board<CellType> board) {
-//        return assignedLane.hasMonsterAhead(pos);
-//    }
+    // private boolean hasMonsterAhead(Position pos, Board<CellType> board) {
+    // return assignedLane.hasMonsterAhead(pos);
+    // }
 
     private boolean hasMonsterAhead(Position newPos, Board<CellType> board) {
         // Check if trying to move behind a monster
-        if (newPos.getX() < currentPosition.getX()) {  // Moving north
+        if (newPos.getX() < currentPosition.getX()) { // Moving north
             for (int row = newPos.getX(); row <= currentPosition.getX(); row++) {
                 Position checkPos = new Position(row, newPos.getY());
                 if (board.hasMonster(checkPos)) {
