@@ -10,6 +10,7 @@ public class WorldGenerator {
     private static final int BOARD_SIZE = 8;
     private static final int NUM_HEROES = 3;
     private static final int NUM_LANES = 3;
+    private IOHelper ioHelper;  // Add this field
 
     // Space distribution percentages
     private static final double BUSH_PERCENTAGE = 0.20;   // 20% Bush
@@ -51,6 +52,7 @@ public class WorldGenerator {
                 ioHelper
         );
     }
+
 
     private Board<CellType> createBoard() {
         Board<CellType> board = new Board<>(BOARD_SIZE, BOARD_SIZE, () -> CellType.PLAIN);

@@ -1,4 +1,3 @@
-
 /*
  * A cell in a 2D Board
  */

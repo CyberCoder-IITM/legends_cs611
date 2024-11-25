@@ -1,4 +1,4 @@
-
+import java.util.List;
 import java.util.Scanner;
 import java.util.function.Predicate;
 
@@ -125,7 +125,6 @@ public class IOHelper {
         }
     }
 
-
     public void displayGameControls() {
         println("\n=== Controls ===");
         println("W/A/S/D - Move");
@@ -134,6 +133,58 @@ public class IOHelper {
         println("I - Inventory");
         println("M - Market (at Nexus only)");
         println("Q - Quit game");
+    }
+
+    // Add method for displaying numbered hero list
+    public void displayHeroList(List<Hero> heroes) {
+        println("\nAvailable Heroes:");
+        println("----------------");
+        for (int i = 0; i < heroes.size(); i++) {
+            Hero hero = heroes.get(i);
+            printf("%2d. %-18s | Type: %-10s | Level: %d\n",
+                    i + 1,
+                    hero.getName(),
+                    hero.getType(),
+                    hero.getLevel()
+            );
+        }
+    }
+
+    // Add method for hero selection with validation
+    public int getHeroSelection(int laneNumber, int maxHeroes) {
+        return nextLineInt(
+                "Select hero for lane " + laneNumber + " (1-" + maxHeroes + "): ",
+                "Invalid choice! Please enter a number between 1 and " + maxHeroes,
+                num -> num >= 1 && num <= maxHeroes
+        );
+    }
+
+    // Add printf method for formatted output
+    public void printf(String format, Object... args) {
+        System.out.printf(ANSI_GREEN + format + ANSI_RESET, args);
+    }
+
+    // Add method for error handling with retry option
+    public boolean retryOnError(String errorMsg) {
+        printErr(errorMsg);
+        return nextLine("Try again? (y/n): ",
+                "Please enter y or n",
+                s -> s.equalsIgnoreCase("y") || s.equalsIgnoreCase("n")
+        ).equalsIgnoreCase("y");
+    }
+
+    // Add method for confirming hero selection
+    public boolean confirmHeroSelection(Hero hero) {
+        println("\nSelected Hero:");
+        printf("Name: %s\nType: %s\nLevel: %d\n",
+                hero.getName(),
+                hero.getType(),
+                hero.getLevel()
+        );
+        return nextLine("Confirm selection? (y/n): ",
+                "Please enter y or n",
+                s -> s.equalsIgnoreCase("y") || s.equalsIgnoreCase("n")
+        ).equalsIgnoreCase("y");
     }
 
     public void displayCombatResult(String attacker, String defender, double damage, boolean dodged) {

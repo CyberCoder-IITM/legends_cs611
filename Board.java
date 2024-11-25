@@ -181,104 +181,99 @@ public class Board<T> {
         }
     }
 
-//    // In Board.java
-//    public void display() {
-//        System.out.println("\nCurrent Board State:");
-//        System.out.println("\nI: Inaccessible  N: Nexus  P: Plain  B: Bush  C: Cave  K: Koulou");
-//        System.out.println("H1/H2/H3: Heroes  M1/M2/M3: Monsters  X: Combat\n");
-//
-//        // Print column numbers with proper spacing
-//        System.out.print("    ");
-//        for (int j = 0; j < cols; j++) {
-//            System.out.print(j + "   ");
-//        }
-//        System.out.println();
-//
-//
-//        // Print board content
-//        for (int i = 0; i < rows; i++) {
-//            System.out.print(i + " ||");
-//            for (int j = 0; j < cols; j++) {
-//                Position currentPos = new Position(i, j);
-//
-//                if (hasHero(currentPos) && hasMonster(currentPos)) {
-//                    System.out.print(" X  |");
-//                } else if (hasHero(currentPos)) {
-//                    Hero hero = heroPositions.get(currentPos);
-//                    System.out.print(" H" + (hero.getAssignedLane().getLaneNumber() + 1) + " |");
-//                } else if (hasMonster(currentPos)) {
-//                    Monster monster = monsterPositions.get(currentPos);
-//                    System.out.print(" M" + (monster.getAssignedLane().getLaneNumber() + 1) + " |");
-//                } else {
-//                    CellType cellType = (CellType)at(currentPos).getValue();
-//                    System.out.print(" " + getCellSymbol(cellType) + "  |");
-//                }
-//            }
-//            System.out.println("|");
-//        }
-//    }
-//
-
-
-
-    // In Board.java
-
     public void display() {
-        System.out.println("\nCurrent Board State:");
-        System.out.println("\nI: Inaccessible  N: Nexus  P: Plain  B: Bush  C: Cave  K: Koulou");
-        System.out.println("H1/H2/H3: Heroes  M1/M2/M3: Monsters  X: Combat\n");
-
-        // Print column numbers
+        // Column numbers with proper spacing
         System.out.print("    ");
         for (int j = 0; j < cols; j++) {
-            System.out.print(j + "   ");
+            System.out.printf("%-7d ", j);
         }
         System.out.println();
 
-        // Print board content
         for (int i = 0; i < rows; i++) {
-            System.out.print(i + " ");
+            // Top border
             for (int j = 0; j < cols; j++) {
-                Position currentPos = new Position(i, j);
+                Position pos = new Position(i, j);
+                CellType cellType = (CellType)at(pos).getValue();
+                String symbol = getCellSymbol(cellType);
+                System.out.print(symbol + " - " + symbol + " - " + symbol + "  ");
+            }
+            System.out.println();
 
-                // Start cell
-                if (isSpecialCell(i, j)) {
-                    System.out.print("|[");
-                } else {
-                    System.out.print("| ");
+            // Middle section with improved spacing
+            for (int j = 0; j < cols; j++) {
+                Position pos = new Position(i, j);
+                if (j == 0) {
+                    System.out.print(" |");
                 }
 
-                // Cell content
-                if (hasHero(currentPos) && hasMonster(currentPos)) {
-                    System.out.print("X");
-                } else if (hasHero(currentPos)) {
-                    Hero hero = heroPositions.get(currentPos);
-                    System.out.print("H" + (hero.getAssignedLane().getLaneNumber() + 1));
-                } else if (hasMonster(currentPos)) {
-                    Monster monster = monsterPositions.get(currentPos);
-                    System.out.print("M" + (monster.getAssignedLane().getLaneNumber() + 1));
+                if (hasHero(pos) && hasMonster(pos)) {
+                    System.out.printf(" H%d M%d  |",
+                            heroPositions.get(pos).getAssignedLane().getLaneNumber() + 1,
+                            monsterPositions.get(pos).getAssignedLane().getLaneNumber() + 1);
+                } else if (hasHero(pos)) {
+                    System.out.printf(" H%-6d|",
+                            heroPositions.get(pos).getAssignedLane().getLaneNumber() + 1);
+                } else if (hasMonster(pos)) {
+                    System.out.printf(" M%-6d|",
+                            monsterPositions.get(pos).getAssignedLane().getLaneNumber() + 1);
+                } else if (at(pos).getValue() == CellType.INACCESSIBLE) {
+                    System.out.print("  X X X X  |");
                 } else {
-                    CellType cellType = (CellType)at(currentPos).getValue();
-                    System.out.print(getCellSymbol(cellType));
-                }
-
-                // End cell
-                if (isSpecialCell(i, j)) {
-                    System.out.print("]");
-                } else {
-                    System.out.print(" ");
+                    System.out.print("         |");
                 }
             }
-            System.out.println("|");
+            System.out.println();
 
-            // Print horizontal separator
-            System.out.print("  ");
+            // Bottom border
             for (int j = 0; j < cols; j++) {
-                System.out.print("----");
+                Position pos = new Position(i, j);
+                CellType cellType = (CellType)at(pos).getValue();
+                String symbol = getCellSymbol(cellType);
+                System.out.print(symbol + " - " + symbol + " - " + symbol + "  ");
             }
-            System.out.println("-");
+            System.out.println();
+
+            // Add extra newline only between rows, not after the last row
+            if (i < rows - 1) {
+                System.out.println();
+            }
         }
     }
+
+
+
+    private String getCellSymbol(CellType cellType) {
+        if (cellType == null) return " ";
+
+        switch (cellType) {
+            case BUSH:
+                return ConsoleColors.GREEN + "B" + ConsoleColors.RESET;
+            case CAVE:
+                return ConsoleColors.PURPLE + "C" + ConsoleColors.RESET;
+            case KOULOU:
+                return ConsoleColors.YELLOW_BOLD + "K" + ConsoleColors.RESET;
+            case PLAIN:
+                return ConsoleColors.WHITE + "P" + ConsoleColors.RESET;
+            case NEXUS:
+                return ConsoleColors.CYAN + "N" + ConsoleColors.RESET;
+            case INACCESSIBLE:
+                return ConsoleColors.RED_BOLD + "I" + ConsoleColors.RESET;
+            default:
+                return " ";
+        }
+    }
+//    private String getCellSymbol(CellType type) {
+//        switch (type) {
+//            case NEXUS: return "[N]";
+//            case INACCESSIBLE: return " X ";
+//            case PLAIN: return " · ";
+//            case BUSH: return " 🌳";    // Bush emoji
+//            case CAVE: return " ⛰️";    // Cave/Mountain emoji
+//            case KOULOU: return " ⚡";   // Lightning emoji for Koulou
+//            default: return "   ";
+//        }
+//    }
+
 
     // Helper method to determine if a cell should have brackets
     private boolean isSpecialCell(int row, int col) {
@@ -308,29 +303,33 @@ public class Board<T> {
         // Bold
         public static final String RED_BOLD = "\033[1;31m";    // RED
         public static final String YELLOW_BOLD = "\033[1;33m"; // YELLOW
+
+        public static final String WHITE = "\033[0;37m";     // WHITE
+        public static final String RED = "\033[0;31m";       // RED
+        public static final String BLUE_BOLD = "\033[1;34m"; // BLUE_BOLD
     }
 
-    // If you want to add colors, here's the Java 8 compatible version
-    private String getCellSymbol(CellType cellType) {
-        if (cellType == null) return " ";
-
-        switch (cellType) {
-            case BUSH:
-                return ConsoleColors.GREEN + "🌳" + ConsoleColors.RESET;
-            case CAVE:
-                return ConsoleColors.PURPLE + "⛰️" + ConsoleColors.RESET;
-            case KOULOU:
-                return ConsoleColors.YELLOW_BOLD + "⚡" + ConsoleColors.RESET;
-            case PLAIN:
-                return "·";
-            case NEXUS:
-                return ConsoleColors.CYAN + "N" + ConsoleColors.RESET;
-            case INACCESSIBLE:
-                return ConsoleColors.RED_BOLD + "X" + ConsoleColors.RESET;
-            default:
-                return " ";
-        }
-    }
+//    // If you want to add colors, here's the Java 8 compatible version
+//    private String getCellSymbol(CellType cellType) {
+//        if (cellType == null) return " ";
+//
+//        switch (cellType) {
+//            case BUSH:
+//                return ConsoleColors.GREEN + "🌳" + ConsoleColors.RESET;
+//            case CAVE:
+//                return ConsoleColors.PURPLE + "⛰️" + ConsoleColors.RESET;
+//            case KOULOU:
+//                return ConsoleColors.YELLOW_BOLD + "⚡" + ConsoleColors.RESET;
+//            case PLAIN:
+//                return "·";
+//            case NEXUS:
+//                return ConsoleColors.CYAN + "N" + ConsoleColors.RESET;
+//            case INACCESSIBLE:
+//                return ConsoleColors.RED_BOLD + "X" + ConsoleColors.RESET;
+//            default:
+//                return " ";
+//        }
+//    }
 
     public boolean hasHero(Position p) {
         boolean has = heroPositions.containsKey(p);
