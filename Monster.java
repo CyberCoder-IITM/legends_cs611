@@ -1,12 +1,11 @@
+
 /*
  * Represents a monster
  */
 import java.util.Random;
 
-public class Monster {
-    private String name;
+public class Monster extends Living {
     private MonsterType type;
-    private int level;
     private double hp;
     private double damage;
     private double defense;
@@ -16,10 +15,9 @@ public class Monster {
     private static final double TERRAIN_BONUS = 0.1; // 10% bonus
 
     public Monster(String name, MonsterType type, int level, double hp, double damage,
-                   double defense, double dodge, Position spawnPosition, Lane lane) {
-        this.name = name;
+            double defense, double dodge, Position spawnPosition, Lane lane) {
+        super(name, level);
         this.type = type;
-        this.level = level;
         this.hp = hp;
         this.damage = damage;
         this.defense = defense;
@@ -29,17 +27,34 @@ public class Monster {
     }
 
     // Existing getters
-    public String getName() { return name; }
-    public MonsterType getType() { return type; }
-    public int getLevel() { return level; }
-    public double getHp() { return hp; }
-    public double getDamage() { return damage; }
-    public double getDefense() { return defense; }
-    public double getDodge() { return dodge; }
+    public MonsterType getType() {
+        return type;
+    }
+
+    public double getHp() {
+        return hp;
+    }
+
+    public double getDamage() {
+        return damage;
+    }
+
+    public double getDefense() {
+        return defense;
+    }
+
+    public double getDodge() {
+        return dodge;
+    }
 
     // New getters
-    public Position getCurrentPosition() { return currentPosition; }
-    public Lane getAssignedLane() { return assignedLane; }
+    public Position getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public Lane getAssignedLane() {
+        return assignedLane;
+    }
 
     public boolean moveForward(Board<CellType> board) {
         Position newPosition = new Position(currentPosition.getX() + 1, currentPosition.getY());
@@ -59,9 +74,9 @@ public class Monster {
     }
 
     private boolean canMove(Position newPos, Board<CellType> board) {
-//        return board.isValid(newPos) &&
-//                !board.isInaccessible(newPos) &&
-//                !board.hasMonster(newPos);
+        // return board.isValid(newPos) &&
+        // !board.isInaccessible(newPos) &&
+        // !board.hasMonster(newPos);
         // Check basic validity
         if (!board.isValid(newPos)) {
             return false;
@@ -116,7 +131,7 @@ public class Monster {
 
     // Optional: Implement terrain bonuses for harder difficulty
     public void applyTerrainEffect(CellType cellType) {
-        switch(cellType) {
+        switch (cellType) {
             case BUSH:
             case CAVE:
                 this.dodge *= (1 + TERRAIN_BONUS);
@@ -130,7 +145,7 @@ public class Monster {
     }
 
     public void removeTerrainEffect(CellType cellType) {
-        switch(cellType) {
+        switch (cellType) {
             case BUSH:
             case CAVE:
                 this.dodge /= (1 + TERRAIN_BONUS);
@@ -146,6 +161,6 @@ public class Monster {
     @Override
     public String toString() {
         return String.format("%s (Lvl %d) HP:%.0f DMG:%.0f DEF:%.0f DDG:%.0f",
-                name, level, hp, damage, defense, dodge);
+                this.getName(), this.getLevel(), hp, damage, defense, dodge);
     }
 }
