@@ -1,5 +1,5 @@
-# CS611-Assignment <4>
-## < Legends: Monsters and Heroes >
+# CS611-Assignment <5>
+## < Legends of Valor >
 ---------------------------------------------------------------------------
 - Name: Sundeep Routhu
 - Email: srouthu@bu.edu
@@ -25,6 +25,7 @@
 **Potion.java**                 - Item which is a poiton\
 **PotionType.java**             - Type of potion\
 \
+**Living.java**                 - Represents a living object\
 **Hero.java**                   - Represents a singular hero\
 **Heros.java**                  - All heroes\
 **HeroParty.java**              - A party of heroes\
@@ -36,36 +37,51 @@
 **Monsters.java**               - All monsters \
 **MonsterParty.java**           - A party of monsters\
 **MonsterType.java**            - The type of monster\
-**MonsterFactory.java**         - Generates monsters when heroes goes on a tile\
-**RandomMonsterFactory.java**   - Generates random monsters when heroes goes on a tile\
+**MonsterFactory.java**         - Generates monsters\
+**RandomMonsterFactory.java**   - Generates random monsters on the lane\
+
+**Lane.java**                   - Represents a single lane in the game\
+**Market.java**                 - A place to buy items\
+**SpellEffect.java**            - A spell effect\
+**TerrainEffect.java**          - A terrain effect\
 \
 **IOHelper.java**               - A utility class to print in console\
 \
-**Move.java**                   - Move made by the party of heroes\
-**Legends.java**                - The core central loop controlling the game\
 **WorldGenerator.java**         - Generates the world, heroes and market\
-**FightStrategy.java**          - Strategy pattern to determine the fight\
-**AllFightStrategy.java**       - Heroes can attack any monster in the monster party\
+**RPGGame.java**                - Plays a RPG Game\
+**Legends.java**                - The core central loop controlling the game\
 
 ## Notes
 ---------------------------------------------------------------------------
 
 ### Features / Design Document
-- A world is generated with random heroes in the party and a market
-- Each turn the player gives input to decide the heroes move direction
-    - "h" will give you the list of all inputs and what they will do
-    - "w/a/s/d" moves the heroes
-    - "p" prints the whole world
-    - "i" shows the heroes information
-    - "v" lets heroes modify their inventory
-        - Heroes can equip items or use potions
-    - "q" quits the game
+- Able to see the instructions before the game starts
+- Able to select three heroes, one for each lane
+- Heroes status will be displayed before their turn
+- Heroes moves will be displayed before their turn
+    - Can move the heroes with "w/a/s/d" 
+    - Can attack the monster if on the same or adjacent tile
+    - Can cast a spell
+    - Can teleport to another targets
+    - Can recall to nexus
+    - Can use an item
+    - Can buy items from the market
+    - Can quit the game
 - Market provides various items which the heroes can buy and equip
 - Heroes can sell tems if they are on the market
-- Monsters are generated randomly when the hero party goes on a tile
-- Heroes can select the monster they want to fight with
-- Fight ends when heroes die or monsters die, When all heroes dies then the game ends
+- Monsters are generated after every 8th turn
+- Heroes can fight the monsters if they are adjacent
+- There are three types of terrains(bush,cave,koulou) and each have their own effect
+- Heroes cannot cross to another lane without teleporting
+- Heroes can be recalled to the nexus
+- Game ends when the opponent reaches the others nexus
+- Heroes can select the monster they want to fight with, for now there is only 1 monster in the group
 - Have a fixed set of heroes, items, monsters
+- The whole map can be seen when a hero moves
+    - Heroes are shows as H1,H2,H3
+    - Monsters are shown as M1,M2,M3
+    - Obstacles are shown as XXXX
+    - Terrain types are marked with B for Bush, K for Koulou, C for Cave,
 - Console output is colored(only in terminals which support ANSI escape codes)
     - Errors are in red
     - Prompts are in yellow
@@ -74,8 +90,6 @@
 
 ### Design Decisions
 - **Item.java** is an abstract class and other items like weapons, armors extend an item.
-- Visitor patter is used to apply/equip an item by an Hero
-- Strategy pattern is used to change how monsters and heroes fight
 - Factories are used at multiple places, like generating the world etc.
 - *Composition over inheritance* is utilized at a few places.
 - *Separation of concerns* is important so each responsibily is encapsulated by different components like Hero, Party, Item etc. Even IO operations are handled in its own class.
@@ -88,12 +102,6 @@ Directions on how to run the code.
 javac App.java && java App
 ```
 
-## Caveats
----------------------------------------------------------------------------
-- Spells are not implemented
-- Game is not balanced at all
-- Currently cannot unequip an item
-
 ## UML
 ---------------------------------------------------------------------------
 ![plot](./legends_uml.png)
@@ -102,260 +110,841 @@ javac App.java && java App
 ## Input/Output Example
 ---------------------------------------------------------------------------
 ```
-generating a random world and heroes
-This is the World
-H: heros
-M: market
-W: wall
-+--+--+--+--+--+--+--+--+
-| H|  |  |  |  |  |  |  |
-+--+--+--+--+--+--+--+--+
-|  | M|  |  |  |  |  |  |
-+--+--+--+--+--+--+--+--+
-| W|  |  |  |  |  |  |  |
-+--+--+--+--+--+--+--+--+
-|  |  |  |  |  |  |  |  |
-+--+--+--+--+--+--+--+--+
-|  |  |  |  |  |  |  |  |
-+--+--+--+--+--+--+--+--+
-|  |  |  |  |  |  |  |  |
-+--+--+--+--+--+--+--+--+
-|  |  |  |  |  |  |  |  |
-+--+--+--+--+--+--+--+--+
-|  |  |  |  |  |  |  |  |
-+--+--+--+--+--+--+--+--+
-------------- Heroes and their information ----------------
-Name         : Undefeated Yoj
-Type         : WARRIOR
-level        : 1
-experience   : 7
-HP           : 100.0
-MP           : 400.0
-Strength     : 2000.0
-Dexterity    : 400.0
-Agility      : 700.0
-Gold         : 2500
-------------- Heroes and their information ----------------
-Name         : Skoraeus Stonebones
-Type         : PALADIN
-level        : 1
-experience   : 4
-HP           : 100.0
-MP           : 250.0
-Strength     : 2000.0
-Dexterity    : 600.0
-Agility      : 350.0
-Gold         : 2500
-------------- Heroes and their information ----------------
-Name         : Rillifane Rallathil
-Type         : SORCEROR
-level        : 1
-experience   : 9
-HP           : 100.0
-MP           : 1300.0
-Strength     : 2000.0
-Dexterity    : 450.0
-Agility      : 500.0
-Gold         : 2500
-[+] Move(w/a/s/d/q/i/m/p/v/h): 
->> s
-fight started with the monsters
-Showing all monsters
-------------------------------
-name     : BunsenBurner
-type     : DRAGON
-level    : 4
-HP       : 100.0
-damage   : 40.0
-defense  : 500.0
-dodge    : 45.0
-------------------------------
-name     : Brandobaris
-type     : DRAGON
-level    : 3
-HP       : 100.0
-damage   : 35.0
-defense  : 450.0
-dodge    : 30.0
-the following monsters are alive: BunsenBurner,Brandobaris
-it is Undefeated Yoj's turn
-[+] Do you want to see their stats?(y/n)
->> n
-[+] which monster do you want to attact?
->> BunsenBurner
-monster BunsenBurner has taken 100.0 damage from the hero Undefeated Yoj
-monster BunsenBurner has died
-the following monsters are alive: Brandobaris
-it is Skoraeus Stonebones's turn
-[+] Do you want to see their stats?(y/n)
->> n
-[+] which monster do you want to attact?
->> BunsenBurner
-not a valid input or monster is dead
-[+] which monster do you want to attact?
->> n
-not a valid input or monster is dead
-[+] which monster do you want to attact?
->> Brandobaris
-monster Brandobaris has dodged the attack
-the following monsters are alive: Brandobaris
-it is Rillifane Rallathil's turn
-[+] Do you want to see their stats?(y/n)
->> n
-[+] which monster do you want to attact?
->> Brandobaris
-monster Brandobaris has dodged the attack
-hero Undefeated Yoj has taken 35.0 damage from the monster Brandobaris
-the following monsters are alive: Brandobaris
-it is Undefeated Yoj's turn
-[+] Do you want to see their stats?(y/n)
->> n
-[+] which monster do you want to attact?
->> Brandobaris
-monster Brandobaris has taken 100.0 damage from the hero Undefeated Yoj
-monster Brandobaris has died
-All monsters are dead
-[+] Move(w/a/s/d/q/i/m/p/v/h): 
->> s
-not a valid direction to move(encountered a wall)
-[+] Move(w/a/s/d/q/i/m/p/v/h): 
->> d
-[+] Move(w/a/s/d/q/i/m/p/v/h): 
->> p
-This is the World
-H: heros
-M: market
-W: wall
-+--+--+--+--+--+--+--+--+
-|  |  |  |  |  |  |  |  |
-+--+--+--+--+--+--+--+--+
-|  |HM|  |  |  |  |  |  |
-+--+--+--+--+--+--+--+--+
-| W|  |  |  |  |  |  |  |
-+--+--+--+--+--+--+--+--+
-|  |  |  |  |  |  |  |  |
-+--+--+--+--+--+--+--+--+
-|  |  |  |  |  |  |  |  |
-+--+--+--+--+--+--+--+--+
-|  |  |  |  |  |  |  |  |
-+--+--+--+--+--+--+--+--+
-|  |  |  |  |  |  |  |  |
-+--+--+--+--+--+--+--+--+
-|  |  |  |  |  |  |  |  |
-+--+--+--+--+--+--+--+--+
-[+] Move(w/a/s/d/q/i/m/p/v/h): 
->> m
-marker has the following items and prices
-Bow : 300.0
-Mermaid Tears : 850.0
-Breast plate : 350.0
-Wizard Shield : 1200.0
-Axe : 550.0
-Full Body Armor : 1000.0
-Scythe : 1000.0
-Luck Elixir : 500.0
-Platinum Shield : 150.0
-TSwords : 1400.0
-Strength Potion : 200.0
-Sword : 500.0
-Guardian Angel : 1000.0
-Dagger : 200.0
-Healing Potion : 250.0
-Magic Potion : 350.0
-heroes are: Undefeated Yoj,Skoraeus Stonebones,Rillifane Rallathil
-[+] for which hero do you want to sell or buy(q to quit):
+╔══════════════════════════════════════════╗
+║           Legends of Valor               ║
+║    A MOBA-style Heroes vs Monsters Game  ║
+╚══════════════════════════════════════════╝
+
+Welcome to Legends of Valor!
+Get ready to battle in this MOBA-style adventure.
+
+Press Enter to continue...
+[+] 
+>> 
+
+=== Welcome to Legends of Valor ===
+A MOBA-style game where heroes battle monsters!
+
+1. Start New Game
+2. Show Instructions
+3. Quit
+[+] Enter your choice (1-3): 
+>> 1
+
+Select 3 heroes for your team:
+
+Available Heroes:
+----------------
+Gaerdal Ironhand     | Type: WARRIOR    | Level: 1
+Sehanine Monnbow     | Type: WARRIOR    | Level: 1
+Muamman Duathall     | Type: WARRIOR    | Level: 1
+Flandal Steelskin    | Type: WARRIOR    | Level: 1
+Undefeated Yoj       | Type: WARRIOR    | Level: 1
+Eunoia Cyn           | Type: WARRIOR    | Level: 1
+Rillifane Rallathil  | Type: SORCEROR   | Level: 1
+Segojan Earthcaller  | Type: SORCEROR   | Level: 1
+Reign Havoc          | Type: SORCEROR   | Level: 1
+Reverie Ashels       | Type: SORCEROR   | Level: 1
+Kalabar              | Type: SORCEROR   | Level: 1
+Parzival             | Type: PALADIN    | Level: 1
+Sehanine Moonbow     | Type: PALADIN    | Level: 1
+Skoraeus Stonebones  | Type: PALADIN    | Level: 1
+
+[+] Select hero for lane 1: 
+>> Kalabar
+
+Available Heroes:
+----------------
+Gaerdal Ironhand     | Type: WARRIOR    | Level: 1
+Sehanine Monnbow     | Type: WARRIOR    | Level: 1
+Muamman Duathall     | Type: WARRIOR    | Level: 1
+Flandal Steelskin    | Type: WARRIOR    | Level: 1
+Undefeated Yoj       | Type: WARRIOR    | Level: 1
+Eunoia Cyn           | Type: WARRIOR    | Level: 1
+Rillifane Rallathil  | Type: SORCEROR   | Level: 1
+Segojan Earthcaller  | Type: SORCEROR   | Level: 1
+Reign Havoc          | Type: SORCEROR   | Level: 1
+Reverie Ashels       | Type: SORCEROR   | Level: 1
+Kalabar              | Type: SORCEROR   | Level: 1
+Parzival             | Type: PALADIN    | Level: 1
+Sehanine Moonbow     | Type: PALADIN    | Level: 1
+Skoraeus Stonebones  | Type: PALADIN    | Level: 1
+
+[+] Select hero for lane 2: 
 >> Skoraeus Stonebones
-Skoraeus Stonebones has 2500 gold
-[+] do you want to buy any item?(y/n)
->> y
-[+] which item do you want to buy?
->> TSwords
-[+] do you want to sell any item?(y/n)
->> n
-[+] for which hero do you want to sell or buy(q to quit):
->> q
-[+] Move(w/a/s/d/q/i/m/p/v/h): 
->> v
-Heroes: Undefeated Yoj, Skoraeus Stonebones, Rillifane Rallathil
-[+] select a hero to show their inventory
->> Skoraeus Stonebones
-inventory for the hero: Skoraeus Stonebones
-name:TSwords type:WEAPON
-[+] item to use(q to quit):
->> TSwords
-[+] Move(w/a/s/d/q/i/m/p/v/h): 
->> i
-------------- Heroes and their information ----------------
-Name         : Undefeated Yoj
-Type         : WARRIOR
-level        : 1
-experience   : 7
-HP           : 286.65
-MP           : 400.0
-Strength     : 2000.0
-Dexterity    : 400.0
-Agility      : 700.0
-Gold         : 2500
-------------- Heroes and their information ----------------
-Name         : Skoraeus Stonebones
-Type         : PALADIN
-level        : 1
-experience   : 4
-HP           : 441.0
-MP           : 250.0
-Strength     : 2000.0
-Dexterity    : 600.0
-Agility      : 350.0
-Gold         : 1100
-------------- Heroes and their information ----------------
-Name         : Rillifane Rallathil
-Type         : SORCEROR
-level        : 1
-experience   : 9
-HP           : 441.0
-MP           : 1300.0
-Strength     : 2000.0
-Dexterity    : 450.0
-Agility      : 500.0
-Gold         : 2500
-[+] Move(w/a/s/d/q/i/m/p/v/h): 
->> v
-Heroes: Undefeated Yoj, Skoraeus Stonebones, Rillifane Rallathil
-[+] select a hero to show their inventory
->> Skoraeus Stonebones
-inventory for the hero: Skoraeus Stonebones
-name:TSwords type:WEAPON (Equipped)
-[+] item to use(q to quit):
->> q
-[+] Move(w/a/s/d/q/i/m/p/v/h): 
->> d
-fight started with the monsters
-Showing all monsters
-------------------------------
-name     : Chrysophylax
-type     : DRAGON
-level    : 2
-HP       : 100.0
-damage   : 20.0
-defense  : 500.0
-dodge    : 20.0
-------------------------------
-name     : BunsenBurner
-type     : DRAGON
-level    : 4
-HP       : 0.0
-damage   : 40.0
-defense  : 500.0
-dodge    : 45.0
-the following monsters are alive: Chrysophylax
-it is Undefeated Yoj's turn
-[+] Do you want to see their stats?(y/n)
->> n
-[+] which monster do you want to attact?
->> Chrysophylax
-monster Chrysophylax has taken 100.0 damage from the hero Undefeated Yoj
-monster Chrysophylax has died
-All monsters are dead
-[+] Move(w/a/s/d/q/i/m/p/v/h): 
->> q
+
+Available Heroes:
+----------------
+Gaerdal Ironhand     | Type: WARRIOR    | Level: 1
+Sehanine Monnbow     | Type: WARRIOR    | Level: 1
+Muamman Duathall     | Type: WARRIOR    | Level: 1
+Flandal Steelskin    | Type: WARRIOR    | Level: 1
+Undefeated Yoj       | Type: WARRIOR    | Level: 1
+Eunoia Cyn           | Type: WARRIOR    | Level: 1
+Rillifane Rallathil  | Type: SORCEROR   | Level: 1
+Segojan Earthcaller  | Type: SORCEROR   | Level: 1
+Reign Havoc          | Type: SORCEROR   | Level: 1
+Reverie Ashels       | Type: SORCEROR   | Level: 1
+Kalabar              | Type: SORCEROR   | Level: 1
+Parzival             | Type: PALADIN    | Level: 1
+Sehanine Moonbow     | Type: PALADIN    | Level: 1
+Skoraeus Stonebones  | Type: PALADIN    | Level: 1
+
+[+] Select hero for lane 3: 
+>> Reign Havoc 
+Invalid hero name
+[+] Select hero for lane 3: 
+>> Reign Havoc 
+Welcome to Legends of Valor!
+-----------------------------
+Reach the monster's nexus to win!
+Don't let monsters reach your nexus!
+
+Controls:
+W/A/S/D - Move
+T - Teleport
+R - Recall
+I - Use Item
+M - Market (at Nexus only)
+Spawned Natsunomeryu (Level 1) in lane 1
+Spawned BigBad-Wolf (Level 1) in lane 2
+Spawned Chrysophylax (Level 1) in lane 3
+
+=== Round 1 ===
+    0       1       2       3       4       5       6       7       
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ | M1     |         |  X X X X  | M2     |         |  X X X X  | M3     |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ | H1     |         |  X X X X  | H2     |         |  X X X X  | H3     |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+=== Heroes' Turn ===
+
+=== Skoraeus Stonebones's Status ===
+HP: 100.0/100.0
+MP: 250.0/250.0
+Position: (7,3)
+Current Space: NEXUS
+[+] Choose action:
+1. Move (W/A/S/D)
+2. Attack
+3. Cast Spell
+4. Teleport
+5. Recall
+6. Use Item
+7. Market (only in Nexus)
+Q. Quit
+Choice: 
+>> 4
+
+Possible teleport targets:
+1. Kalabar at (7,0)
+2. Reign Havoc at (7,6)
+[+] Choose hero to teleport to (1-2): 
+>> 1
+[+] Choose action:
+1. Move (W/A/S/D)
+2. Attack
+3. Cast Spell
+4. Teleport
+5. Recall
+6. Use Item
+7. Market (only in Nexus)
+Q. Quit
+Choice: 
+>> 1
+[+] [+] Enter direction (W/A/S/D): 
+>> W
+Skoraeus Stonebones moved W
+    0       1       2       3       4       5       6       7       
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ | M1     |         |  X X X X  | M2     |         |  X X X X  | M3     |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+ |         |         |  X X X X  | H2     |         |  X X X X  |         |         |
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ | H1     |         |  X X X X  |         |         |  X X X X  | H3     |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+=== Kalabar's Status ===
+HP: 100.0/100.0
+MP: 800.0/800.0
+Position: (7,0)
+Current Space: NEXUS
+[+] Choose action:
+1. Move (W/A/S/D)
+2. Attack
+3. Cast Spell
+4. Teleport
+5. Recall
+6. Use Item
+7. Market (only in Nexus)
+Q. Quit
+Choice: 
+>> 7
+[+] Market Options:
+1. Buy
+2. Sell
+3. Exit
+Choice: 
+>> 3
+
+=== Reign Havoc's Status ===
+HP: 100.0/100.0
+MP: 800.0/800.0
+Position: (7,6)
+Current Space: NEXUS
+[+] Choose action:
+1. Move (W/A/S/D)
+2. Attack
+3. Cast Spell
+4. Teleport
+5. Recall
+6. Use Item
+7. Market (only in Nexus)
+Q. Quit
+Choice: 
+>> 1
+[+] [+] Enter direction (W/A/S/D): 
+>> W
+Reign Havoc moved W
+    0       1       2       3       4       5       6       7       
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ | M1     |         |  X X X X  | M2     |         |  X X X X  | M3     |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+ |         |         |  X X X X  | H2     |         |  X X X X  | H3     |         |
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ | H1     |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+=== Monsters' Turn ===
+Chrysophylax moves forward!
+BigBad-Wolf moves forward!
+Natsunomeryu moves forward!
+
+=== Round 2 ===
+    0       1       2       3       4       5       6       7       
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+ | M1     |         |  X X X X  | M2     |         |  X X X X  | M3     |         |
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+ |         |         |  X X X X  | H2     |         |  X X X X  | H3     |         |
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ | H1     |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+=== Heroes' Turn ===
+
+=== Skoraeus Stonebones's Status ===
+HP: 100.0/100.0
+MP: 250.0/250.0
+Position: (6,3)
+Current Space: PLAIN
+[+] Choose action:
+1. Move (W/A/S/D)
+2. Attack
+3. Cast Spell
+4. Teleport
+5. Recall
+6. Use Item
+7. Market (only in Nexus)
+Q. Quit
+Choice: 
+>> 1
+[+] [+] Enter direction (W/A/S/D): 
+>> W
+Skoraeus Stonebones moved W
+    0       1       2       3       4       5       6       7       
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+ | M1     |         |  X X X X  | M2     |         |  X X X X  | M3     |         |
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+ |         |         |  X X X X  | H2     |         |  X X X X  |         |         |
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  | H3     |         |
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ | H1     |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+=== Kalabar's Status ===
+HP: 100.0/100.0
+MP: 800.0/800.0
+Position: (7,0)
+Current Space: NEXUS
+[+] Choose action:
+1. Move (W/A/S/D)
+2. Attack
+3. Cast Spell
+4. Teleport
+5. Recall
+6. Use Item
+7. Market (only in Nexus)
+Q. Quit
+Choice: 
+>> 1
+[+] [+] Enter direction (W/A/S/D): 
+>> W
+Kalabar moved W
+    0       1       2       3       4       5       6       7       
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+ | M1     |         |  X X X X  | M2     |         |  X X X X  | M3     |         |
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+ |         |         |  X X X X  | H2     |         |  X X X X  |         |         |
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+ | H1     |         |  X X X X  |         |         |  X X X X  | H3     |         |
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+=== Reign Havoc's Status ===
+HP: 100.0/100.0
+MP: 800.0/800.0
+Position: (6,6)
+Current Space: BUSH
+[+] Choose action:
+1. Move (W/A/S/D)
+2. Attack
+3. Cast Spell
+4. Teleport
+5. Recall
+6. Use Item
+7. Market (only in Nexus)
+Q. Quit
+Choice: 
+>> 1
+[+] [+] Enter direction (W/A/S/D): 
+>> W
+Reign Havoc moved W
+    0       1       2       3       4       5       6       7       
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+ | M1     |         |  X X X X  | M2     |         |  X X X X  | M3     |         |
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+ |         |         |  X X X X  | H2     |         |  X X X X  | H3     |         |
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+ | H1     |         |  X X X X  |         |         |  X X X X  |         |         |
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+=== Monsters' Turn ===
+Chrysophylax moves forward!
+BigBad-Wolf moves forward!
+Natsunomeryu moves forward!
+
+=== Round 3 ===
+    0       1       2       3       4       5       6       7       
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+ | M1     |         |  X X X X  | M2     |         |  X X X X  | M3     |         |
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+ |         |         |  X X X X  | H2     |         |  X X X X  | H3     |         |
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+ | H1     |         |  X X X X  |         |         |  X X X X  |         |         |
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+=== Heroes' Turn ===
+
+=== Skoraeus Stonebones's Status ===
+HP: 100.0/100.0
+MP: 250.0/250.0
+Position: (5,3)
+Current Space: KOULOU
+[+] Choose action:
+1. Move (W/A/S/D)
+2. Attack
+3. Cast Spell
+4. Teleport
+5. Recall
+6. Use Item
+7. Market (only in Nexus)
+Q. Quit
+Choice: 
+>> 1
+[+] [+] Enter direction (W/A/S/D): 
+>> W
+Skoraeus Stonebones moved W
+    0       1       2       3       4       5       6       7       
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+ | M1     |         |  X X X X  | M2     |         |  X X X X  | M3     |         |
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+ |         |         |  X X X X  | H2     |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  | H3     |         |
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+ | H1     |         |  X X X X  |         |         |  X X X X  |         |         |
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+=== Kalabar's Status ===
+HP: 100.0/100.0
+MP: 800.0/800.0
+Position: (6,0)
+Current Space: BUSH
+[+] Choose action:
+1. Move (W/A/S/D)
+2. Attack
+3. Cast Spell
+4. Teleport
+5. Recall
+6. Use Item
+7. Market (only in Nexus)
+Q. Quit
+Choice: 
+>> 1
+[+] [+] Enter direction (W/A/S/D): 
+>> W
+Kalabar moved W
+    0       1       2       3       4       5       6       7       
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+ | M1     |         |  X X X X  | M2     |         |  X X X X  | M3     |         |
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+ |         |         |  X X X X  | H2     |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+ | H1     |         |  X X X X  |         |         |  X X X X  | H3     |         |
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+=== Reign Havoc's Status ===
+HP: 100.0/100.0
+MP: 800.0/800.0
+Position: (5,6)
+Current Space: CAVE
+[+] Choose action:
+1. Move (W/A/S/D)
+2. Attack
+3. Cast Spell
+4. Teleport
+5. Recall
+6. Use Item
+7. Market (only in Nexus)
+Q. Quit
+Choice: 
+>> 1
+[+] [+] Enter direction (W/A/S/D): 
+>> W
+Reign Havoc moved W
+    0       1       2       3       4       5       6       7       
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+ | M1     |         |  X X X X  | M2     |         |  X X X X  | M3     |         |
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+ |         |         |  X X X X  | H2     |         |  X X X X  | H3     |         |
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+ | H1     |         |  X X X X  |         |         |  X X X X  |         |         |
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+=== Monsters' Turn ===
+Chrysophylax moves forward!
+BigBad-Wolf moves forward!
+Natsunomeryu moves forward!
+
+=== Round 4 ===
+    0       1       2       3       4       5       6       7       
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+ | M1     |         |  X X X X  | M2     |         |  X X X X  | M3     |         |
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+ |         |         |  X X X X  | H2     |         |  X X X X  | H3     |         |
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+ | H1     |         |  X X X X  |         |         |  X X X X  |         |         |
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+=== Heroes' Turn ===
+
+=== Skoraeus Stonebones's Status ===
+HP: 100.0/100.0
+MP: 250.0/250.0
+Position: (4,3)
+Current Space: PLAIN
+[+] Choose action:
+1. Move (W/A/S/D)
+2. Attack
+3. Cast Spell
+4. Teleport
+5. Recall
+6. Use Item
+7. Market (only in Nexus)
+Q. Quit
+Choice: 
+>> 1
+[+] [+] Enter direction (W/A/S/D): 
+>> W
+Invalid move!
+[+] Choose action:
+1. Move (W/A/S/D)
+2. Attack
+3. Cast Spell
+4. Teleport
+5. Recall
+6. Use Item
+7. Market (only in Nexus)
+Q. Quit
+Choice: 
+>> 1
+[+] [+] Enter direction (W/A/S/D): 
+>> W
+Invalid move!
+[+] Choose action:
+1. Move (W/A/S/D)
+2. Attack
+3. Cast Spell
+4. Teleport
+5. Recall
+6. Use Item
+7. Market (only in Nexus)
+Q. Quit
+Choice: 
+>> 1
+[+] [+] Enter direction (W/A/S/D): 
+>> @
+Invalid direction
+[+] [+] Enter direction (W/A/S/D): 
+>> W
+Invalid move!
+[+] Choose action:
+1. Move (W/A/S/D)
+2. Attack
+3. Cast Spell
+4. Teleport
+5. Recall
+6. Use Item
+7. Market (only in Nexus)
+Q. Quit
+Choice: 
+>> 2
+
+Monsters in range:
+1. BigBad-Wolf (HP: 100.0, Position: (3,3))
+[+] Choose monster to attack (1-1): 
+>> 1
+Skoraeus Stonebones dealt 100.0 damage to BigBad-Wolf!
+BigBad-Wolf has been defeated!
+Skoraeus Stonebones received 500 gold!
+Kalabar received 500 gold!
+Reign Havoc received 500 gold!
+
+After monster defeat:
+    0       1       2       3       4       5       6       7       
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  P - P - P  I - I - I  B - B - B  B - B - B  I - I - I  K - K - K  K - K - K  
+
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+K - K - K  C - C - C  I - I - I  C - C - C  K - K - K  I - I - I  C - C - C  K - K - K  
+
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+ | M1     |         |  X X X X  |         |         |  X X X X  | M3     |         |
+P - P - P  B - B - B  I - I - I  K - K - K  B - B - B  I - I - I  B - B - B  P - P - P  
+
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+ |         |         |  X X X X  | H2     |         |  X X X X  | H3     |         |
+K - K - K  C - C - C  I - I - I  P - P - P  C - C - C  I - I - I  K - K - K  C - C - C  
+
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+ | H1     |         |  X X X X  |         |         |  X X X X  |         |         |
+B - B - B  C - C - C  I - I - I  K - K - K  C - C - C  I - I - I  C - C - C  C - C - C  
+
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+B - B - B  B - B - B  I - I - I  P - P - P  P - P - P  I - I - I  B - B - B  C - C - C  
+
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+ |         |         |  X X X X  |         |         |  X X X X  |         |         |
+N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  I - I - I  N - N - N  N - N - N  
+
+=== Kalabar's Status ===
+HP: 100.0/100.0
+MP: 800.0/800.0
+Position: (5,0)
+Current Space: BUSH
+[+] Choose action:
+1. Move (W/A/S/D)
+2. Attack
+3. Cast Spell
+4. Teleport
+5. Recall
+6. Use Item
+7. Market (only in Nexus)
+Q. Quit
+Choice: 
+>> 
 ```
