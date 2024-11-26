@@ -188,8 +188,6 @@ protected Map<EquipmentSlot, Item> equippedItems;
         return false;
     }
 
-
-
     public boolean teleport(Position targetPosition, Board<CellType> board) {
         if (!canTeleportTo(targetPosition, board)) {
             return false;
@@ -228,7 +226,6 @@ protected Map<EquipmentSlot, Item> equippedItems;
             respawn();
         }
     }
-    // Add these methods to your Hero class
 
     public boolean hasWeaponEquipped(EquipmentSlot slot) {
         Item equippedItem = equippedItems.get(slot);
@@ -355,9 +352,6 @@ protected Map<EquipmentSlot, Item> equippedItems;
 
     }
 
-//    private boolean hasMonsterAhead(Position pos, Board<CellType> board) {
-//        return assignedLane.hasMonsterAhead(pos);
-//    }
 
     private boolean hasMonsterAhead(Position newPos, Board<CellType> board) {
         // Check if trying to move behind a monster

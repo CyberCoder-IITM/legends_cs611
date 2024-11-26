@@ -182,10 +182,10 @@ public class Board<T> {
     }
 
     public void display() {
-        // Column numbers with proper spacing
-        System.out.print("    ");
+
+        System.out.print("   "); // Initial spacing for alignment
         for (int j = 0; j < cols; j++) {
-            System.out.printf("%-7d ", j);
+            System.out.print(j + "          "); // 11 spaces after each number
         }
         System.out.println();
 
@@ -262,19 +262,6 @@ public class Board<T> {
                 return " ";
         }
     }
-//    private String getCellSymbol(CellType type) {
-//        switch (type) {
-//            case NEXUS: return "[N]";
-//            case INACCESSIBLE: return " X ";
-//            case PLAIN: return " · ";
-//            case BUSH: return " 🌳";    // Bush emoji
-//            case CAVE: return " ⛰️";    // Cave/Mountain emoji
-//            case KOULOU: return " ⚡";   // Lightning emoji for Koulou
-//            default: return "   ";
-//        }
-//    }
-
-
     // Helper method to determine if a cell should have brackets
     private boolean isSpecialCell(int row, int col) {
         Position pos = new Position(row, col);
@@ -309,43 +296,8 @@ public class Board<T> {
         public static final String BLUE_BOLD = "\033[1;34m"; // BLUE_BOLD
     }
 
-//    // If you want to add colors, here's the Java 8 compatible version
-//    private String getCellSymbol(CellType cellType) {
-//        if (cellType == null) return " ";
-//
-//        switch (cellType) {
-//            case BUSH:
-//                return ConsoleColors.GREEN + "🌳" + ConsoleColors.RESET;
-//            case CAVE:
-//                return ConsoleColors.PURPLE + "⛰️" + ConsoleColors.RESET;
-//            case KOULOU:
-//                return ConsoleColors.YELLOW_BOLD + "⚡" + ConsoleColors.RESET;
-//            case PLAIN:
-//                return "·";
-//            case NEXUS:
-//                return ConsoleColors.CYAN + "N" + ConsoleColors.RESET;
-//            case INACCESSIBLE:
-//                return ConsoleColors.RED_BOLD + "X" + ConsoleColors.RESET;
-//            default:
-//                return " ";
-//        }
-//    }
-
     public boolean hasHero(Position p) {
         boolean has = heroPositions.containsKey(p);
         return has;
     }
-
-
-//    private String getCellSymbol(CellType cellType) {
-//        switch(cellType) {
-//            case NEXUS: return "N";
-//            case INACCESSIBLE: return "I";
-//            case BUSH: return "B";
-//            case CAVE: return "C";
-//            case KOULOU: return "K";
-//            case PLAIN: return "P";
-//            default: return " ";
-//        }
-//    }
 }
