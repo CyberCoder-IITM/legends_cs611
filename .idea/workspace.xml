@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d6339476-3661-4ebe-b67d-be87dce33984" name="Changes" comment="Done with Spacing">
+    <list default="true" id="d6339476-3661-4ebe-b67d-be87dce33984" name="Changes" comment="Added Name in ReadMe">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/legends/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/legends/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/legends/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +50,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$USER_HOME$/Downloads/legendsOfValor/legendsOfValor" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Downloads/292881824" />
   </component>
   <component name="RunManager">
     <configuration name="App" type="Application" factoryName="Application">
@@ -140,7 +142,14 @@
       <option name="project" value="LOCAL" />
       <updated>1732594362252</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Added Name in ReadMe">
+      <created>1732594612714</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1732594612714</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -160,6 +169,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Updates" />
     <MESSAGE value="Done with Spacing" />
-    <option name="LAST_COMMIT_MESSAGE" value="Done with Spacing" />
+    <MESSAGE value="Added Name in ReadMe" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added Name in ReadMe" />
   </component>
 </project>

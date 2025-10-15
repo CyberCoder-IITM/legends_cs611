@@ -1,9 +1,9 @@
 # CS611-Assignment <5>
 ## < Legends of Valor >
 ---------------------------------------------------------------------------
-- Name: Sundeep Routhu
-- Email: srouthu@bu.edu
-- Student ID: U77551834
+- Name: Sundeep Routhu         - Name: Saleeq Adnan Syed
+- Email: srouthu@bu.edu        - Email: Saleeq@bu.edu
+- Student ID: U77551834        - Student ID: U34331475
 
 ## Files
 ---------------------------------------------------------------------------
